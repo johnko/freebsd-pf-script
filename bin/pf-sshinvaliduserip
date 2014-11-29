@@ -1,0 +1,106 @@
+#!/bin/sh
+######################################################################
+# LICENSE pulled in with, cat LICENSE  | awk '{print "# "$0}'
+######################################################################
+
+# Copyright (c) 2014, John Ko
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# * Redistributions of source code must retain the above copyright notice, this
+#   list of conditions and the following disclaimer.
+#
+# * Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+######################################################################
+# Script version is YYmmdd-HHMM in UTC, date +%y%m%d-%H%M%S
+######################################################################
+SCRIPTVERSION=141129-050734
+
+for i in pf-sshinvaliduserip pf-table ; do
+	if ! which $i >/dev/null 2>&1 ; then
+		echo "ERROR: Missing $i."
+		exit 1
+	fi
+done
+
+omitcomments() {
+	egrep -v '^\s*#'
+}
+
+if [ "$1" = "block" -o "$1" = "black" ]; then
+	# block
+	for i in $( pf-sshinvaliduserip toblacklist | omitcomments | awk '{print $2}' ) ; do
+		pf-table add blacklist $i
+	done
+	exit
+fi
+
+IGNORELIST=$( pf-table show whitelist | tr '\n' '|' | tr -d ' ' )
+if [ "x${IGNORELIST}" = "x" ]; then
+	IGNORELIST="randomstringofdatahere"
+fi
+if [ "x" != "x${SSH_CLIENT%% *}" ]; then
+	IGNORELIST="${IGNORELIST%|}|${SSH_CLIENT%% *}|"
+fi
+BLACKLIST=$( pf-table show blacklist | tr '\n' '|' | tr -d ' ' )
+if [ "x${BLACKLIST}" = "x" ]; then
+	BLACKLIST="randomstringofdatahere"
+fi
+SSHBANLIST=$( pf-table show sshbanlist | tr '\n' '|' | tr -d ' ' )
+if [ "x${SSHBANLIST}" = "x" ]; then
+	SSHBANLIST="randomstringofdatahere"
+fi
+
+LASTAWK='$1 > 20 {print $0}'
+if [ "$1" = "-a" -o "$2" = "-a" ]; then
+	# Show all if -a
+	LASTAWK='{print $0}'
+fi
+
+
+if [ "$1" = "toblacklist" ]; then
+	IGNORESSH="randomstringofdatahere"
+else
+	IGNORESSH="(${SSHBANLIST%|})"
+fi
+echo cat /var/log/auth.log  \
+	egrep -v "(${IGNORELIST%|})"  \
+	egrep -v "(${BLACKLIST%|})"  \
+	egrep -v "${IGNORESSH}"  \
+	grep Invalid  \
+	awk '{print $10}'  \
+	sort  uniq -c  sort  \
+	awk "${LASTAWK}"
+cat /var/log/auth.log | \
+	egrep -v "(${IGNORELIST%|})" | \
+	egrep -v "(${BLACKLIST%|})" | \
+	egrep -v "${IGNORESSH}" | \
+	grep Invalid | \
+	awk '{print $10}' | \
+	sort | uniq -c | sort | \
+	awk "${LASTAWK}"
+
+cat <<EOF
+# !!!!! WARNING !!!!!
+# If there are IP addresses listed above the WARNNG line, they may have
+# attempted to login via SSH with an invalid user over 20 times!
+# You can probably ban or blacklist them with your firewall.
+# Example:
+# $0 block
+EOF
