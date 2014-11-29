@@ -199,6 +199,11 @@ EOF
   for i in $nics; do
     ########## LOOPED PER INTERFACE except lo0, enc0, ipfw0, pflog0, plip0
     cat >>${tmpfile} <<EOF
+
+
+
+########## LOOP FOR $i ##########
+
 #          1f.3 allow pfsync and carp
 pass quick on $i proto pfsync keep state (no-sync)
 pass on $i proto carp keep state
@@ -288,7 +293,8 @@ pass in on $i proto udp from any to (self) port \$udp_ports keep state ( source-
 
 
 
-########## REGULAR RULES ##########
+########## NO LIMITS ##########
+
 #          1a VPN
 pass in quick on $i proto \$ipsec_proto from any to (self)
 pass in quick on $i proto { tcp, udp } from any port \$ipsec_ports to (self) port \$ipsec_ports
