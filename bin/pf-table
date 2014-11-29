@@ -1,0 +1,102 @@
+#!/bin/sh
+######################################################################
+# LICENSE pulled in with, cat LICENSE  | awk '{print "# "$0}'
+######################################################################
+
+# Copyright (c) 2014, John Ko
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# * Redistributions of source code must retain the above copyright notice, this
+#   list of conditions and the following disclaimer.
+#
+# * Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+######################################################################
+# Script version is YYmmdd-HHMM in UTC, date +%y%m%d-%H%M%S
+######################################################################
+SCRIPTVERSION=141129-044646
+
+######################################################################
+# Variables you can edit
+######################################################################
+
+prefix=/etc/pf
+backup=/etc/pf/bkp
+
+if [ "$( id -u )" != "0" ]; then
+	echo "ERROR: Must be root!"
+	exit 1
+fi
+
+usage() {
+	cat <<EOF
+usage:  ${0##*/} add table address/mask
+				${0##*/} backup table
+				${0##*/} clear table
+				${0##*/} expire table
+				${0##*/} import table file
+				${0##*/} load table
+				${0##*/} remove table address/mask
+				${0##*/} save table
+				${0##*/} show table
+EOF
+}
+
+if [ -z "$2" ]; then usage ; exit 1 ; fi
+
+case $1 in
+add)
+	if [ -z "$3" ]; then usage ; exit 1 ; fi
+	pfctl -P -t $2 -T add "$3" 2>/dev/null ;;
+backup)
+	install -d -m 700 ${backup}
+	outfile=${backup}/$2.table.`date +%y%m%d-%H%M%S`
+	prevfile=`ls -1tr ${backup}/$2.table.* 2>/dev/null | tail -1 `
+	pfctl -P -t $2 -T show >${outfile} 2>/dev/null
+	if [ "x" != "x$prevfile" -a "$prevfile" != "$outfile" ]; then
+		if /usr/bin/diff $prevfile $outfile >/dev/null 2>&1 ; then
+			/bin/rm $outfile
+		else
+			echo $outfile
+		fi
+	else
+		echo $outfile
+	fi
+;;
+clear)
+	########## remove entries
+	pfctl -P -t $2 -T expire 0 2>/dev/null ;;
+expire)
+	########## remove entries which have not been referenced in 86400 seconds (1 day) x 100
+	pfctl -P -t $2 -T expire 8640000 2>/dev/null ;;
+import)
+	if [ -z "$3" ]; then usage ; exit 1 ; fi
+	pfctl -P -t $2 -T replace -f "$3" 2>/dev/null ;;
+load)
+	pfctl -P -t $2 -T replace -f "${prefix}/$2.table" 2>/dev/null ;;
+remove)
+	if [ -z "$3" ]; then usage ; exit 1 ; fi
+	pfctl -P -t $2 -T delete "$3" 2>/dev/null ;;
+save)
+	pfctl -P -t $2 -T show >"${prefix}/$2.table" 2>/dev/null ;;
+show)
+	pfctl -P -t $2 -T show 2>/dev/null ;;
+*)
+	usage ; exit 1 ;;
+esac
