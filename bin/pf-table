@@ -30,7 +30,7 @@
 ######################################################################
 # Script version is YYmmdd-HHMM in UTC, date +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=141129-044646
+SCRIPTVERSION=141129-045105
 
 ######################################################################
 # Variables you can edit
@@ -71,7 +71,7 @@ backup)
 	pfctl -P -t $2 -T show >${outfile} 2>/dev/null
 	if [ "x" != "x$prevfile" -a "$prevfile" != "$outfile" ]; then
 		if /usr/bin/diff $prevfile $outfile >/dev/null 2>&1 ; then
-			/bin/rm $outfile
+			rm $outfile
 		else
 			echo $outfile
 		fi
