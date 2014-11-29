@@ -31,7 +31,7 @@
 ######################################################################
 # Script version is YYmmdd-HHMM in UTC, date +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=141129-185930
+SCRIPTVERSION=141129-190544
 
 ######################################################################
 # Variables you can edit
@@ -131,7 +131,7 @@ scrub in all fragment reassemble
 scrub out all random-id
 
 #          6o If you have MTU problem or something like that
-# scrub out all random-id max-mss 1400
+#          scrub out all random-id max-mss 1400
 
 #          7o tables definition
 table <black> persist file "${prefix}/black.table"
@@ -154,23 +154,23 @@ rdr-anchor loadbalance
 rdr-anchor jails
 
 #          2t EXAMPLE Temporarily ban mass downloaders (assuming 401 is not used)
-# rdr proto tcp from <weblimit> to any port \$web_ports -> 127.0.0.1 port 401
+#          rdr proto tcp from <weblimit> to any port \$web_ports -> 127.0.0.1 port 401
 
 #          3t EXAMPLE redirect tcp 444 to 443
-# rdr on lo0 proto tcp from any to any port 444 -> 127.0.0.1 port 443
+#          rdr on lo0 proto tcp from any to any port 444 -> 127.0.0.1 port 443
 
 #          4t EXAMPLE load balance incoming (inet is for ipv4)
-# web_servers = "{ 10.0.0.10, 10.0.0.11, 10.0.0.13 }"
-# rdr proto tcp from any to any port 80 -> \$web_servers round-robin sticky-address
+#          web_servers = "{ 10.0.0.10, 10.0.0.11, 10.0.0.13 }"
+#          rdr proto tcp from any to any port 80 -> \$web_servers round-robin sticky-address
 anchor loadbalance
 load anchor loadbalance from "${prefix}/loadbalance.anchor"
 
 #          5t EXAMPLE jail
 #          Port redirection (forwarding) from your IP to your jails’s IPs
-# rdr on re0 proto tcp to port http -> 10.0.0.1 port http
-# rdr on re0 proto tcp to port imap -> 10.0.0.2 port imap
+#          rdr on re0 proto tcp to port http -> 10.0.0.1 port http
+#          rdr on re0 proto tcp to port imap -> 10.0.0.2 port imap
 #          If jails need network access (e.g. to download ports) create NAT on your external network interface:
-# nat on re0 from lo1:network to any -> (re0)
+#          nat on re0 from lo1:network to any -> (re0)
 anchor jails
 load anchor jails from "${prefix}/jails.anchor"
 anchor ftpout
@@ -181,10 +181,11 @@ anchor ftpout
 #          1f block default
 block log (user) all
 
-#          Problematic with multi interface
-# block in log quick from no-route to any
-# block in log quick from urpf-failed to any
-# allow localhost to localhost
+#          1f.1 Problematic with multi interface
+#          block in log quick from no-route to any
+#          block in log quick from urpf-failed to any
+
+#          1f.2 allow localhost to localhost
 pass on lo0 from (self) to (self)
 EOF
 
@@ -198,6 +199,7 @@ EOF
   for i in $nics; do
     ########## LOOPED PER INTERFACE except lo0, enc0, ipfw0, pflog0, plip0
     cat >>${tmpfile} <<EOF
+#          1f.3 allow pfsync and carp
 pass quick on $i proto pfsync keep state (no-sync)
 pass on $i proto carp keep state
 
@@ -217,8 +219,8 @@ block log quick on $i proto { tcp, udp } from <sshban> to (self) port \$ssh_port
 pass on $i inet proto icmp all icmp-type \$icmp_types keep state
 
 #          5f allow traceroute
-# allow out the default range for traceroute(8):
-# "base+nhops*nqueries-1" (33434+64*3-1)
+#          allow out the default range for traceroute(8):
+#          "base+nhops*nqueries-1" (33434+64*3-1)
 pass out on $i proto udp from (self) to any port 33433 >< 33626 keep state
 
 #          6f allow outgoing packets that have our address as source,
@@ -308,38 +310,39 @@ EOF
   ########## Create backup if different, then replace /etc/pf/pf.conf
   if ! /usr/bin/diff ${tmpfile} ${prefix}/pf.conf >/dev/null 2>&1 ; then
     install -d -m 700 ${backup}
-    cp -a ${prefix}/pf.conf ${backup}/pf.conf.`date +%y%m%d-%H%M%S`
+    test -e ${prefix}/pf.conf && \
+      cp -a ${prefix}/pf.conf ${backup}/pf.conf.`date +%y%m%d-%H%M%S`
     mv -f ${tmpfile} ${prefix}/pf.conf
   else
     rm ${tmpfile}
   fi
 
-  ########## NOT USED ##########
-  if [ -n "$MYNIC" ]; then
-    cat >/dev/null <<EOF
-    # 4f block martians that should not be routed through Internet
-    # ONLY UNCOMMENT IF int != int_if
-    #block drop in quick on \$int from \$martians to any
-    #block drop out quick on \$int from any to \$martians
-    tun_if = "gif0"
-    int = "$MYNIC"
-    ext_ipaddr = "{ $MYIP4ADDRESS }"
-    localnet = \$int:network
-    # 1t nat tunnel
-    nat on \$tun_if inet from \$localnet to any -> (\$tun_if)
-    # 2t nat router
-    #nat on \$int inet from ! (\$int) to any -> (\$int)
-    # 3t nat load balance
-    #nat on \$int inet from any to any -> 192.0.2.16/28 source-hash
-    # 1f VPN
-    pass in quick on \$tun_if from any to any
-    pass out quick on \$tun_if from any to any
-    # 8f allow act as gateway in and out to only some services
-    pass log inet proto { tcp, udp } from \$localnet to any port \$client_out keep state
-    ########## ANTISPOOF ##########
-    antispoof for \$int
+########## NOT USED ##########
+if [ -n "$MYNIC" ]; then
+cat >/dev/null <<EOF
+#          4f block martians that should not be routed through Internet
+#          ONLY UNCOMMENT IF int != int_if
+#block drop in quick on \$int from \$martians to any
+#block drop out quick on \$int from any to \$martians
+tun_if = "gif0"
+int = "$MYNIC"
+ext_ipaddr = "{ $MYIP4ADDRESS }"
+localnet = \$int:network
+#          1t nat tunnel
+nat on \$tun_if inet from \$localnet to any -> (\$tun_if)
+#          2t nat router
+#nat on \$int inet from ! (\$int) to any -> (\$int)
+#          3t nat load balance
+#nat on \$int inet from any to any -> 192.0.2.16/28 source-hash
+#          1f VPN
+pass in quick on \$tun_if from any to any
+pass out quick on \$tun_if from any to any
+#          8f allow act as gateway in and out to only some services
+pass log inet proto { tcp, udp } from \$localnet to any port \$client_out keep state
+########## ANTISPOOF ##########
+antispoof for \$int
 EOF
-  fi
+fi
 }
 
 ######################################################################
