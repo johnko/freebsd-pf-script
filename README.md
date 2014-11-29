@@ -34,3 +34,9 @@ Remove an item from your sshban list
 ```
 pf-table remove sshban 8.8.8.8
 ```
+
+# FAQ
+
+## Why call it gdf?
+
+Because I needed to configure a god damn firewall.
