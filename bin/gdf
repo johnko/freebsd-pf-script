@@ -31,7 +31,7 @@
 ######################################################################
 # Script version is YYmmdd-HHMM in UTC, date +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=141129-051811
+SCRIPTVERSION=141129-185739
 
 ######################################################################
 # Variables you can edit
@@ -64,12 +64,8 @@ setuppf()
 pass out quick proto tcp from (self) port >10000 to any modulate state
 pass in quick proto tcp from any port 20 to (self) keep state
 EOF
-  if [ -e ${prefix}/pf.conf ]; then
-    mv -f ${prefix}/pf.conf ${backup}/pf.conf.`date +%y%m%d-%H%M%S`
-  fi
-  if [ ! -e ${prefix}/pf.conf ]; then
-    tmpfile=${prefix}/.pf.tmp
-    cat >${tmpfile} <<EOF
+  tmpfile=${prefix}/.pf.tmp
+  cat >${tmpfile} <<EOF
 martians = "{ \
   127.0.0.0/8, 192.168.0.0/16, 172.16.0.0/12, \
   10.0.0.0/8, 169.254.0.0/16, 192.0.2.0/24, \
@@ -192,16 +188,16 @@ block log (user) all
 pass on lo0 from (self) to (self)
 EOF
 
-    nics=`ifconfig -l | tr ' ' '\n' | \
-    awk '$1 !~ /lo[0-9]/ && \
-    $1 !~ /enc[0-9]/ && \
-    $1 !~ /ipfw[0-9]/ && \
-    $1 !~ /pflog[0-9]/ && \
-    $1 !~ /plip[0-9]/ {print $1}' | tr '\n' ' '`
+  nics=`ifconfig -l | tr ' ' '\n' | \
+  awk '$1 !~ /lo[0-9]/ && \
+  $1 !~ /enc[0-9]/ && \
+  $1 !~ /ipfw[0-9]/ && \
+  $1 !~ /pflog[0-9]/ && \
+  $1 !~ /plip[0-9]/ {print $1}' | tr '\n' ' '`
 
-    for i in $nics; do
-      ########## LOOPED PER INTERFACE except lo0, enc0, ipfw0, pflog0, plip0
-      cat >>${tmpfile} <<EOF
+  for i in $nics; do
+    ########## LOOPED PER INTERFACE except lo0, enc0, ipfw0, pflog0, plip0
+    cat >>${tmpfile} <<EOF
 pass quick on $i proto pfsync keep state (no-sync)
 pass on $i proto carp keep state
 
@@ -297,9 +293,9 @@ pass in quick on $i proto { tcp, udp } from any port \$ipsec_ports to (self) por
 pass out quick on $i proto \$ipsec_proto from (self) to any
 pass out quick on $i proto { tcp, udp } from (self) port \$ipsec_ports to any port \$ipsec_ports
 EOF
-    done
-    ########## NOT LOOPED ##########
-    cat >>${tmpfile} <<EOF
+  done
+  ########## NOT LOOPED ##########
+  cat >>${tmpfile} <<EOF
 
 
 
@@ -308,8 +304,14 @@ EOF
 anchor "ftp-proxy/*"
 pass out proto tcp from (self) to any port 21 modulate state
 EOF
-    mv ${tmpfile} ${prefix}/pf.conf
+
+  ########## Create backup if different, then replace /etc/pf/pf.conf
+  if ! /usr/bin/diff ${tmpfile} ${prefix}/pf.conf >/dev/null 2>&1 ; then
+    install -d -m 700 ${backup}
+    cp -a ${prefix}/pf.conf ${backup}/pf.conf.`date +%y%m%d-%H%M%S`
+    mv -f ${tmpfile} ${prefix}/pf.conf
   fi
+
   ########## NOT USED ##########
   if [ -n "$MYNIC" ]; then
     cat >/dev/null <<EOF
@@ -336,7 +338,6 @@ EOF
     antispoof for \$int
 EOF
   fi
-  #/etc/rc.d/pf onerestart
 }
 
 ######################################################################
