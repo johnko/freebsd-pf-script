@@ -310,6 +310,8 @@ EOF
     install -d -m 700 ${backup}
     cp -a ${prefix}/pf.conf ${backup}/pf.conf.`date +%y%m%d-%H%M%S`
     mv -f ${tmpfile} ${prefix}/pf.conf
+  else
+    rm ${tmpfile}
   fi
 
   ########## NOT USED ##########
