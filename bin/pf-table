@@ -48,14 +48,14 @@ fi
 usage() {
 	cat <<EOF
 usage:  ${0##*/} add table address/mask
-				${0##*/} backup table
-				${0##*/} clear table
-				${0##*/} expire table
-				${0##*/} import table file
-				${0##*/} load table
-				${0##*/} remove table address/mask
-				${0##*/} save table
-				${0##*/} show table
+	${0##*/} backup table
+	${0##*/} clear table
+	${0##*/} expire table
+	${0##*/} import table file
+	${0##*/} load table
+	${0##*/} remove table address/mask
+	${0##*/} save table
+	${0##*/} show table
 EOF
 }
 
