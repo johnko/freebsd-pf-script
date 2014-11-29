@@ -30,7 +30,7 @@
 ######################################################################
 # Script version is YYmmdd-HHMM in UTC, date +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=141129-045105
+SCRIPTVERSION=141129-045238
 
 ######################################################################
 # Variables you can edit
@@ -63,12 +63,12 @@ if [ -z "$2" ]; then usage ; exit 1 ; fi
 case $1 in
 add)
 	if [ -z "$3" ]; then usage ; exit 1 ; fi
-	pfctl -P -t $2 -T add "$3" 2>/dev/null ;;
+	pfctl -P -t $2 -T add "$3" 2>/dev/null || exit $? ;;
 backup)
 	install -d -m 700 ${backup}
 	outfile=${backup}/$2.table.`date +%y%m%d-%H%M%S`
 	prevfile=`ls -1tr ${backup}/$2.table.* 2>/dev/null | tail -1 `
-	pfctl -P -t $2 -T show >${outfile} 2>/dev/null
+	pfctl -P -t $2 -T show >${outfile} 2>/dev/null || exit $?
 	if [ "x" != "x$prevfile" -a "$prevfile" != "$outfile" ]; then
 		if /usr/bin/diff $prevfile $outfile >/dev/null 2>&1 ; then
 			rm $outfile
@@ -81,22 +81,22 @@ backup)
 ;;
 clear)
 	########## remove entries
-	pfctl -P -t $2 -T expire 0 2>/dev/null ;;
+	pfctl -P -t $2 -T expire 0 2>/dev/null || exit $? ;;
 expire)
 	########## remove entries which have not been referenced in 86400 seconds (1 day) x 100
-	pfctl -P -t $2 -T expire 8640000 2>/dev/null ;;
+	pfctl -P -t $2 -T expire 8640000 2>/dev/null || exit $? ;;
 import)
 	if [ -z "$3" ]; then usage ; exit 1 ; fi
-	pfctl -P -t $2 -T replace -f "$3" 2>/dev/null ;;
+	pfctl -P -t $2 -T replace -f "$3" 2>/dev/null || exit $? ;;
 load)
-	pfctl -P -t $2 -T replace -f "${prefix}/$2.table" 2>/dev/null ;;
+	pfctl -P -t $2 -T replace -f "${prefix}/$2.table" 2>/dev/null || exit $? ;;
 remove)
 	if [ -z "$3" ]; then usage ; exit 1 ; fi
-	pfctl -P -t $2 -T delete "$3" 2>/dev/null ;;
+	pfctl -P -t $2 -T delete "$3" 2>/dev/null || exit $? ;;
 save)
-	pfctl -P -t $2 -T show >"${prefix}/$2.table" 2>/dev/null ;;
+	pfctl -P -t $2 -T show >"${prefix}/$2.table" 2>/dev/null || exit $? ;;
 show)
-	pfctl -P -t $2 -T show 2>/dev/null ;;
+	pfctl -P -t $2 -T show 2>/dev/null || exit $? ;;
 *)
 	usage ; exit 1 ;;
 esac
