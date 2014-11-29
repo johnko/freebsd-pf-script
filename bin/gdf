@@ -31,7 +31,7 @@
 ######################################################################
 # Script version is YYmmdd-HHMM in UTC, date +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=141129-041841
+SCRIPTVERSION=141129-051811
 
 ######################################################################
 # Variables you can edit
@@ -51,9 +51,9 @@ setuppf()
   chmod -R go-rwx ${prefix}
   install -d -m 700 ${backup} >/dev/null 2>&1
   chmod -R go-rwx ${backup}
-  touch ${prefix}/blacklist.table
-  touch ${prefix}/sshbanlist.table
-  touch ${prefix}/whitelist.table
+  touch ${prefix}/black.table
+  touch ${prefix}/sshban.table
+  touch ${prefix}/white.table
   touch ${prefix}/weblimit.table
   touch ${prefix}/maillimit.table
   touch ${prefix}/outlimit.table
@@ -138,9 +138,9 @@ scrub out all random-id
 # scrub out all random-id max-mss 1400
 
 #          7o tables definition
-table <blacklist> persist file "${prefix}/blacklist.table"
-table <sshbanlist> persist file "${prefix}/sshbanlist.table"
-table <whitelist> persist file "${prefix}/whitelist.table"
+table <black> persist file "${prefix}/black.table"
+table <sshban> persist file "${prefix}/sshban.table"
+table <white> persist file "${prefix}/white.table"
 table <weblimit> persist file "${prefix}/weblimit.table"
 table <maillimit> persist file "${prefix}/maillimit.table"
 table <outlimit> persist file "${prefix}/outlimit.table"
@@ -211,11 +211,11 @@ pass quick on $i inet proto { tcp, udp } from any to any port \$dhcpfailover kee
 pass out quick on $i inet proto { tcp, udp } from any port \$dhcpfailover to any modulate state
 block in on $i from any to 255.255.255.255
 
-#          3f block sshbanlist
-pass in quick on $i from <whitelist> to (self) keep state
-pass out quick on $i from (self) to <whitelist> modulate state
-block quick on $i from <blacklist>
-block log quick on $i proto { tcp, udp } from <sshbanlist> to (self) port \$ssh_ports
+#          3f block sshban
+pass in quick on $i from <white> to (self) keep state
+pass out quick on $i from (self) to <white> modulate state
+block quick on $i from <black>
+block log quick on $i proto { tcp, udp } from <sshban> to (self) port \$ssh_ports
 
 #          4f allow echo
 pass on $i inet proto icmp all icmp-type \$icmp_types keep state
@@ -251,7 +251,7 @@ pass out quick on $i from (self) to <outlimit> modulate state ( max-src-conn 5, 
 ########## RATE LIMIT ##########
 #          1r rate limit 15 connections, at 15 new per 2 seconds
 pass out on $i proto { tcp, udp } from (self) port \$ssh_ports to any modulate state
-pass in on $i proto { tcp, udp } from any to (self) port \$ssh_ports keep state ( max-src-conn 15, max-src-conn-rate 15/2, overload <sshbanlist> )
+pass in on $i proto { tcp, udp } from any to (self) port \$ssh_ports keep state ( max-src-conn 15, max-src-conn-rate 15/2, overload <sshban> )
 
 #          2r rate limit 1000 connections, at 1000 new per 1 seconds
 #          some browsers open parallel connections

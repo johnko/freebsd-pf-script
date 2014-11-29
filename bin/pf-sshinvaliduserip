@@ -30,7 +30,7 @@
 ######################################################################
 # Script version is YYmmdd-HHMM in UTC, date +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=141129-050734
+SCRIPTVERSION=141129-051931
 
 for i in pf-sshinvaliduserip pf-table ; do
 	if ! which $i >/dev/null 2>&1 ; then
@@ -46,23 +46,23 @@ omitcomments() {
 if [ "$1" = "block" -o "$1" = "black" ]; then
 	# block
 	for i in $( pf-sshinvaliduserip toblacklist | omitcomments | awk '{print $2}' ) ; do
-		pf-table add blacklist $i
+		pf-table add black $i
 	done
 	exit
 fi
 
-IGNORELIST=$( pf-table show whitelist | tr '\n' '|' | tr -d ' ' )
+IGNORELIST=$( pf-table show white | tr '\n' '|' | tr -d ' ' )
 if [ "x${IGNORELIST}" = "x" ]; then
 	IGNORELIST="randomstringofdatahere"
 fi
 if [ "x" != "x${SSH_CLIENT%% *}" ]; then
 	IGNORELIST="${IGNORELIST%|}|${SSH_CLIENT%% *}|"
 fi
-BLACKLIST=$( pf-table show blacklist | tr '\n' '|' | tr -d ' ' )
+BLACKLIST=$( pf-table show black | tr '\n' '|' | tr -d ' ' )
 if [ "x${BLACKLIST}" = "x" ]; then
 	BLACKLIST="randomstringofdatahere"
 fi
-SSHBANLIST=$( pf-table show sshbanlist | tr '\n' '|' | tr -d ' ' )
+SSHBANLIST=$( pf-table show sshban | tr '\n' '|' | tr -d ' ' )
 if [ "x${SSHBANLIST}" = "x" ]; then
 	SSHBANLIST="randomstringofdatahere"
 fi
