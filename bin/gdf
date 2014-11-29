@@ -31,7 +31,7 @@
 ######################################################################
 # Script version is YYmmdd-HHMM in UTC, date +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=141129-190544
+SCRIPTVERSION=141129-191322
 
 ######################################################################
 # Variables you can edit
@@ -310,8 +310,11 @@ EOF
   ########## Create backup if different, then replace /etc/pf/pf.conf
   if ! /usr/bin/diff ${tmpfile} ${prefix}/pf.conf >/dev/null 2>&1 ; then
     install -d -m 700 ${backup}
-    test -e ${prefix}/pf.conf && \
+    if [ -e ${prefix}/pf.conf ]; then
       cp -a ${prefix}/pf.conf ${backup}/pf.conf.`date +%y%m%d-%H%M%S`
+    else
+      cp -a ${tmpfile} ${backup}/pf.conf.`date +%y%m%d-%H%M%S`
+    fi
     mv -f ${tmpfile} ${prefix}/pf.conf
   else
     rm ${tmpfile}
