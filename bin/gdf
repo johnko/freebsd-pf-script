@@ -31,7 +31,7 @@
 ######################################################################
 # Script version is YYmmdd-HHMM in UTC, date +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=141129-191322
+SCRIPTVERSION=141201-035057
 
 ######################################################################
 # Variables you can edit
@@ -73,7 +73,7 @@ martians = "{ \
 
 ssh_ports = "{ ssh }"
 mail_ports = "{ smtp, smtps, submission, imap, imaps, pop3, pop3s }"
-web_ports = "{ http, https, 6969, 7878 }"
+web_ports = "{ http, https, 3128, 6969, 7878 }"
 db_ports = "{ mysql, postgresql }"
 udp_ports = "{ domain, ntp }"
 dhcp_ports = "{ bootps, bootpc }"
@@ -83,6 +83,7 @@ ftp_ports = "{ ftp, ftp-data, ftps, ftps-data }"
 apple_ports = "{ afpovertcp, rsync, 5900, 5901 }"
 ms_ports = "{ loc-srv, netbios-ns, netbios-dgm, netbios-ssn, microsoft-ds, ldap, ldaps, 3389 }"
 ipsec_ports = "{ isakmp, l2tp, sae-urn }"
+
 ipsec_proto = "{ esp, ah, ipencap }"
 icmp_types = "{ echoreq, unreach }"
 tftp_out = "{ 10000:60000 }"
@@ -90,7 +91,7 @@ tftp_out = "{ 10000:60000 }"
 client_out = "{ \
   ssh, \
   smtp, smtps, submission, imap, imaps, pop3, pop3s, \
-  http, https, 6969, 7878, \
+  http, https, 3128, 6969, 7878, \
   mysql, postgresql, \
   domain, ntp, \
   bootps, bootpc, \
