@@ -52,6 +52,7 @@ setuppf()
   install -d -m 700 ${backup} >/dev/null 2>&1
   chmod -R go-rwx ${backup}
   touch ${prefix}/black.table
+  touch ${prefix}/btfc.table
   touch ${prefix}/sshban.table
   touch ${prefix}/white.table
   touch ${prefix}/weblimit.table
@@ -74,6 +75,7 @@ martians = "{ \
 ssh_ports = "{ ssh }"
 mail_ports = "{ smtp, smtps, submission, imap, imaps, pop3, pop3s }"
 web_ports = "{ http, https, 3128, 6969, 7878 }"
+btfc_ports = "{ 51413:52413 }"
 db_ports = "{ mysql, postgresql }"
 udp_ports = "{ domain, ntp }"
 dhcp_ports = "{ bootps, bootpc }"
@@ -92,6 +94,7 @@ client_out = "{ \
   ssh, \
   smtp, smtps, submission, imap, imaps, pop3, pop3s, \
   http, https, 3128, 6969, 7878, \
+  51413:52413, \
   mysql, postgresql, \
   domain, ntp, \
   bootps, bootpc, \
@@ -136,6 +139,7 @@ scrub out all random-id
 
 #          7o tables definition
 table <black> persist file "${prefix}/black.table"
+table <btfc> persist file "${prefix}/btfc.table"
 table <sshban> persist file "${prefix}/sshban.table"
 table <white> persist file "${prefix}/white.table"
 table <weblimit> persist file "${prefix}/weblimit.table"
@@ -292,6 +296,9 @@ pass in on $i proto { tcp, udp } from any to (self) port \$ms_ports keep state (
 pass out on $i proto { tcp, udp } from (self) port \$udp_ports to any modulate state
 pass in on $i proto udp from any to (self) port \$udp_ports keep state ( source-track rule, max-src-states 2 )
 
+#          10r bittorrent
+pass out on $i proto { tcp, udp } from (self) port \$btfc_ports to <btfc> modulate state
+pass in on $i proto { tcp, udp } from <btfc> to (self) port \$btfc_ports keep state ( max-src-conn 1000, max-src-conn-rate 1000/1 )
 
 
 ########## NO LIMITS ##########
