@@ -31,7 +31,7 @@
 ######################################################################
 # Script version is YYmmdd-HHMM in UTC, date +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=141204-174559
+SCRIPTVERSION=141214-051906
 
 ######################################################################
 # Variables you can edit
@@ -197,9 +197,13 @@ EOF
   nics=`ifconfig -l | tr ' ' '\n' | \
   awk '$1 !~ /lo[0-9]/ && \
   $1 !~ /enc[0-9]/ && \
+  $1 !~ /fwe[0-9]/ && \
+  $1 !~ /fwip[0-9]/ && \
+  $1 !~ /gif[0-9]/ && \
   $1 !~ /ipfw[0-9]/ && \
   $1 !~ /pflog[0-9]/ && \
-  $1 !~ /plip[0-9]/ {print $1}' | tr '\n' ' '`
+  $1 !~ /plip[0-9]/ && \
+  $1 !~ /stf[0-9]/ {print $1}'`
 
   for i in $nics; do
     ########## LOOPED PER INTERFACE except lo0, enc0, ipfw0, pflog0, plip0
