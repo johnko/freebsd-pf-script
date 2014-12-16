@@ -39,4 +39,4 @@ pf-table remove sshban 8.8.8.8
 
 ## Why call it gdf?
 
-Because I needed to configure a god damn firewall.
+Because I needed to configure a **g**od **d**amn **f**irewall.
