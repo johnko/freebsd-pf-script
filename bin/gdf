@@ -2,7 +2,6 @@
 ######################################################################
 # LICENSE pulled in with, cat LICENSE  | awk '{print "# "$0}'
 ######################################################################
-
 # Copyright (c) 2014, John Ko
 # All rights reserved.
 #
@@ -27,9 +26,8 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-
 ######################################################################
-# Script version is YYmmdd-HHMM in UTC, date +%y%m%d-%H%M%S
+# Script version is yymmdd-HHMMSS in UTC, date +%y%m%d-%H%M%S
 ######################################################################
 SCRIPTVERSION=141214-051906
 
