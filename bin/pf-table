@@ -29,7 +29,7 @@
 ######################################################################
 # Script version is yymmdd-HHMMSS in UTC, date +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=141226-055639
+SCRIPTVERSION=141226-055800
 
 ######################################################################
 # Variables you can edit
@@ -62,7 +62,7 @@ if [ -z "$2" ]; then usage ; exit 1 ; fi
 if [ "$2" = "all" ]; then
   case $1 in
     backup|clear|expire|import|load|save|show)
-      for i in "${prefix}/*.table" ; do
+      for i in ${prefix}/*.table ; do
         table=`echo $i | sed "s;${prefix}/;;" | sed 's;\.table;;'`
         echo "Running: $0 $1 $table"
         $0 $1 $table
