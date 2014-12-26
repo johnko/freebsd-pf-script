@@ -29,7 +29,7 @@
 ######################################################################
 # Script version is yymmdd-HHMMSS in UTC, date +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=141129-051931
+SCRIPTVERSION=141226-054543
 
 for i in pf-sshinvaliduserip pf-table ; do
 	if ! which $i >/dev/null 2>&1 ; then
