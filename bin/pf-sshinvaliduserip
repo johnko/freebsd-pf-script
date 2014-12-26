@@ -79,6 +79,10 @@ else
 	IGNORESSH="(${SSHBANLIST%|})"
 fi
 
+if ls /var/log/auth.log*bz2 >/dev/null 2>&1 ; then
+  bunzip2 /var/log/auth.log*bz2
+fi
+
 echo Running: cat /var/log/auth.log  \
 	egrep -v "(${IGNORELIST%|})"  \
 	egrep -v "(${BLACKLIST%|})"  \
@@ -90,7 +94,7 @@ echo Running: cat /var/log/auth.log  \
 cat <<EOF
 # !!!!! WARNING !!!!!
 EOF
-cat /var/log/auth.log | \
+cat /var/log/auth.log* | \
 	egrep -v "(${IGNORELIST%|})" | \
 	egrep -v "(${BLACKLIST%|})" | \
 	egrep -v "${IGNORESSH}" | \
@@ -98,10 +102,9 @@ cat /var/log/auth.log | \
 	awk '{print $10}' | \
 	sort | uniq -c | sort | \
 	awk "${LASTAWK}"
-
 cat <<EOF
 # !!!!! WARNING !!!!!
-# If there are IP addresses listed between the WARNNG line, they may have
+# If there are IP addresses listed between the WARNNG lines, they may have
 # attempted to login via SSH with an invalid user over 20 times!
 # You can probably ban or blacklist them with your firewall.
 # Example:
