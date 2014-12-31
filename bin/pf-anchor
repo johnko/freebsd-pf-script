@@ -55,12 +55,26 @@ EOF
 
 if [ -z "$2" ]; then usage ; exit 1 ; fi
 
+if [ "$2" = "all" ]; then
+  case $1 in
+    backup|clear|load|save|show)
+      for i in ${prefix}/*.anchor ; do
+        anchor=`echo $i | sed "s;${prefix}/;;" | sed 's;\.anchor;;'`
+        echo "Running: $0 $1 $anchor"
+        $0 $1 $anchor
+      done
+    ;;
+  esac
+  exit
+fi
+
 case $1 in
 backup)
   install -d -m 700 ${backup}
   outfile=${backup}/$2.anchor.`date +%y%m%d-%H%M%S`
   prevfile=`ls -1tr ${backup}/$2.anchor.* 2>/dev/null | tail -1 `
-  pfctl -P -t $2 -T show >${outfile} 2>/dev/null || exit $?
+  pfctl -P -a $2 -F nat >${outfile} 2>/dev/null || exit $?
+  pfctl -P -a $2 -F rules >>${outfile} 2>/dev/null || exit $?
   if [ "x" != "x$prevfile" -a "$prevfile" != "$outfile" ]; then
     if /usr/bin/diff $prevfile $outfile >/dev/null 2>&1 ; then
       rm $outfile
