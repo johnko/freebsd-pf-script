@@ -73,8 +73,8 @@ backup)
   install -d -m 700 ${backup}
   outfile=${backup}/$2.anchor.`date +%y%m%d-%H%M%S`
   prevfile=`ls -1tr ${backup}/$2.anchor.* 2>/dev/null | tail -1 `
-  pfctl -P -a $2 -F nat >${outfile} 2>/dev/null || exit $?
-  pfctl -P -a $2 -F rules >>${outfile} 2>/dev/null || exit $?
+  pfctl -P -a $2 -s nat >${outfile} 2>/dev/null || exit $?
+  pfctl -P -a $2 -s rules >>${outfile} 2>/dev/null || exit $?
   if [ "x" != "x$prevfile" -a "$prevfile" != "$outfile" ]; then
     if /usr/bin/diff $prevfile $outfile >/dev/null 2>&1 ; then
       rm $outfile
