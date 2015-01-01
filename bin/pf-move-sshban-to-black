@@ -32,7 +32,7 @@
 SCRIPTVERSION=150101-082359
 
 if ! which pf-table >/dev/null 2>&1; then
-  echo "pf-table not found" >2
+  echo "ERROR: Missing $i." >&2
   exit 1  
 fi
 
