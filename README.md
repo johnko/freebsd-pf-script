@@ -35,6 +35,12 @@ Remove an item from your sshban list
 pf-table remove sshban 8.8.8.8
 ```
 
+If your pf automatically tracks ssh abusers by adding them to an sshban table, you can migrate them to a black table
+
+```
+pf-move-sshban-to-black
+```
+
 # FAQ
 
 ## Why call it gdf?
