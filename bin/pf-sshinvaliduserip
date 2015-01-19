@@ -29,7 +29,7 @@
 ######################################################################
 # Script version is yymmdd-HHMMSS in UTC, date +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=141226-054543
+SCRIPTVERSION=150119-013402
 
 for i in pf-sshinvaliduserip pf-table ; do
 	if ! which $i >/dev/null 2>&1 ; then
@@ -88,7 +88,7 @@ echo Running: cat /var/log/auth.log  \
 	egrep -v "(${BLACKLIST%|})"  \
 	egrep -v "${IGNORESSH}"  \
 	grep Invalid  \
-	awk '{print $10}'  \
+	awk '$10~/^$/{print $9}$10!~/^$/{print $10}'  \
 	sort  uniq -c  sort  \
 	awk "${LASTAWK}"
 cat <<EOF
@@ -99,7 +99,7 @@ cat /var/log/auth.log* | \
 	egrep -v "(${BLACKLIST%|})" | \
 	egrep -v "${IGNORESSH}" | \
 	grep Invalid | \
-	awk '{print $10}' | \
+	awk '$10~/^$/{print $9}$10!~/^$/{print $10}' | \
 	sort | uniq -c | sort | \
 	awk "${LASTAWK}"
 cat <<EOF
