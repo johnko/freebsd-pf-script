@@ -29,7 +29,7 @@
 ######################################################################
 # Script version is yymmdd-HHMMSS in UTC, date +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=150125-023959
+SCRIPTVERSION=150126-073040
 
 ######################################################################
 # Variables you can edit
@@ -91,7 +91,6 @@ client_out = "{ \
   ssh, \
   smtp, smtps, submission, imap, imaps, pop3, pop3s, \
   http, https, 3128, 6969, 7878, \
-  51413:52413, \
   mysql, postgresql, \
   domain, ntp, \
   bootps, bootpc, \
