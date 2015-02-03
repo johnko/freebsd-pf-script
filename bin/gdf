@@ -72,7 +72,7 @@ martians = "{ \
 
 ssh_ports = "{ ssh }"
 mail_ports = "{ smtp, smtps, submission, imap, imaps, pop3, pop3s }"
-web_ports = "{ http, https, 3128, 6969, 7878 }"
+web_ports = "{ http, https, 3128, 6969, 7878, 8080 }"
 db_ports = "{ mysql, postgresql }"
 udp_ports = "{ domain, ntp }"
 dhcp_ports = "{ bootps, bootpc }"
@@ -90,7 +90,7 @@ tftp_out = "{ 10000:60000 }"
 client_out = "{ \
   ssh, \
   smtp, smtps, submission, imap, imaps, pop3, pop3s, \
-  http, https, 3128, 6969, 7878, \
+  http, https, 3128, 6969, 7878, 8080, \
   mysql, postgresql, \
   domain, ntp, \
   bootps, bootpc, \
