@@ -29,7 +29,7 @@
 ######################################################################
 # Script version is yymmdd-HHMMSS in UTC, date +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=150126-073040
+SCRIPTVERSION=150608-061144
 
 ######################################################################
 # Variables you can edit
@@ -82,6 +82,7 @@ ftp_ports = "{ ftp, ftp-data, ftps, ftps-data }"
 apple_ports = "{ afpovertcp, rsync, 5900, 5901 }"
 ms_ports = "{ loc-srv, netbios-ns, netbios-dgm, netbios-ssn, microsoft-ds, ldap, ldaps, 3389 }"
 ipsec_ports = "{ isakmp, l2tp, sae-urn }"
+rtc_ports = "{ 64738 }"
 
 ipsec_proto = "{ esp, ah, ipencap }"
 icmp_types = "{ echoreq, unreach }"
@@ -99,7 +100,8 @@ client_out = "{ \
   ftp, ftp-data, ftps, ftps-data, \
   afpovertcp, rsync, 5900, 5901, \
   loc-srv, netbios-ns, netbios-dgm, netbios-ssn, microsoft-ds, ldap, ldaps, 3389, \
-  isakmp, l2tp, sae-urn }"
+  isakmp, l2tp, sae-urn, \
+  64738 }"
 
 
 
@@ -299,11 +301,15 @@ pass in on $i proto { tcp, udp } from any to (self) port \$ms_ports keep state (
 pass out on $i proto { tcp, udp } from (self) port \$udp_ports to any modulate state
 pass in on $i proto udp from any to (self) port \$udp_ports keep state ( source-track rule, max-src-states 2 )
 
-#          10r IGMP for bittorrent
+#          10r rtc ports
+pass out on $i proto { tcp, udp } from (self) port \$rtc_ports to any modulate state
+pass in on $i proto { tcp, udp } from any to (self) port \$rtc_ports keep state ( max-src-conn 1000, max-src-conn-rate 1000/1 )
+
+#          11r IGMP for bittorrent
 pass out proto igmp all allow-opts
 pass in proto igmp all allow-opts
 
-#          11r local peer discovery for bittorrent transmission-cli
+#          12r local peer discovery for bittorrent transmission-cli
 pass out on $i proto udp from (self) to 239.192.152.143 port 6771 modulate state
 pass in on $i proto udp from any to 239.192.152.143 port 6771 keep state ( source-track rule, max-src-states 10 )
 
