@@ -29,7 +29,7 @@
 ######################################################################
 # Script version is yymmdd-HHMMSS in UTC, date -u +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=150608-063729
+SCRIPTVERSION=150608-085933
 
 ######################################################################
 # Variables you can edit
@@ -72,7 +72,8 @@ martians = "{ \
 
 ssh_ports = "{ ssh }"
 mail_ports = "{ smtp, smtps, submission, imap, imaps, pop3, pop3s }"
-web_ports = "{ http, https, 6969, 7878, 8080 }"
+web_ports = "{ http, https, 5280, 6969, 7878, 8080 }"
+# ejabber web ui is 5280
 db_ports = "{ mysql, postgresql }"
 udp_ports = "{ domain, ntp }"
 dhcp_ports = "{ bootps, bootpc }"
@@ -82,8 +83,9 @@ ftp_ports = "{ ftp, ftp-data, ftps, ftps-data }"
 apple_ports = "{ afpovertcp, rsync, 5900, 5901 }"
 ms_ports = "{ loc-srv, netbios-ns, netbios-dgm, netbios-ssn, microsoft-ds, ldap, ldaps, 3389 }"
 ipsec_ports = "{ isakmp, l2tp, sae-urn }"
-rtc_ports = "{ 64738 }"
+rtc_ports = "{ 64738, 5222, 5269 }"
 # murmur/mumble is 64738
+# xmpp/ejabberd is 5222, 5269
 
 ipsec_proto = "{ esp, ah, ipencap }"
 icmp_types = "{ echoreq, unreach }"
@@ -92,7 +94,7 @@ tftp_out = "{ 10000:60000 }"
 client_out = "{ \
   ssh, \
   smtp, smtps, submission, imap, imaps, pop3, pop3s, \
-  http, https, 6969, 7878, 8080, \
+  http, https, 5280, 6969, 7878, 8080, \
   mysql, postgresql, \
   domain, ntp, \
   bootps, bootpc, \
@@ -102,7 +104,7 @@ client_out = "{ \
   afpovertcp, rsync, 5900, 5901, \
   loc-srv, netbios-ns, netbios-dgm, netbios-ssn, microsoft-ds, ldap, ldaps, 3389, \
   isakmp, l2tp, sae-urn, \
-  64738 }"
+  64738, 5222, 5269 }"
 
 
 
