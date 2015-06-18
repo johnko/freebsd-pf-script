@@ -29,7 +29,7 @@
 ######################################################################
 # Script version is yymmdd-HHMMSS in UTC, date -u +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=150608-085933
+SCRIPTVERSION=150618-103628
 
 ######################################################################
 # Variables you can edit
@@ -195,8 +195,16 @@ block log (user) all
 #          block in log quick from urpf-failed to any
 
 #          1f.2 allow localhost to localhost
-pass on lo0 from (self) to (self)
 EOF
+
+  # lo0 to lo999
+  if ifconfig -l | grep -o 'lo[0-9][0-9]*' >/dev/null ; then
+    for i in `ifconfig -l | grep -o 'lo[0-9][0-9]*'` ; do
+      cat >>${tmpfile} <<EOF
+pass on $i from (self) to (self)
+EOF
+    done
+  fi
 
   nics=`ifconfig -l | tr ' ' '\n' | \
   awk '$1 !~ /lo[0-9]/ && \
