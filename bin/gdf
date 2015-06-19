@@ -29,7 +29,7 @@
 ######################################################################
 # Script version is yymmdd-HHMMSS in UTC, date -u +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=150618-103628
+SCRIPTVERSION=150619-072400
 
 ######################################################################
 # Variables you can edit
@@ -72,7 +72,8 @@ martians = "{ \
 
 ssh_ports = "{ ssh }"
 mail_ports = "{ smtp, smtps, submission, imap, imaps, pop3, pop3s }"
-web_ports = "{ http, https, 5280, 6969, 7878, 8080 }"
+web_ports = "{ http, https, 3128, 5280, 6969, 7878, 8080 }"
+# squid is 3128
 # ejabber web ui is 5280
 db_ports = "{ mysql, postgresql }"
 udp_ports = "{ domain, ntp }"
@@ -94,7 +95,7 @@ tftp_out = "{ 10000:60000 }"
 client_out = "{ \
   ssh, \
   smtp, smtps, submission, imap, imaps, pop3, pop3s, \
-  http, https, 5280, 6969, 7878, 8080, \
+  http, https, 3128, 5280, 6969, 7878, 8080, \
   mysql, postgresql, \
   domain, ntp, \
   bootps, bootpc, \
