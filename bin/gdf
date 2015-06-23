@@ -29,7 +29,7 @@
 ######################################################################
 # Script version is yymmdd-HHMMSS in UTC, date -u +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=150623-094336
+SCRIPTVERSION=150623-111541
 
 ######################################################################
 # Variables you can edit
@@ -82,7 +82,9 @@ dhcp_ports = "{ bootps, bootpc }"
 dhcpfailover = "{ 647, 7911 }"
 tftp_ports = "{ tftp }"
 ftp_ports = "{ ftp, ftp-data, ftps, ftps-data }"
-apple_ports = "{ afpovertcp, rsync, 5900, 5901 }"
+apple_ports = "{ afpovertcp, rsync, 3689, 1900, 8200, 5900, 5901 }"
+# daap is 3689
+# dlna is 1900, 8200
 ms_ports = "{ loc-srv, netbios-ns, netbios-dgm, netbios-ssn, microsoft-ds, ldap, ldaps, 3389 }"
 ipsec_ports = "{ isakmp, l2tp, sae-urn }"
 rtc_ports = "{ 64738, 5222, 5269 }"
@@ -92,22 +94,6 @@ rtc_ports = "{ 64738, 5222, 5269 }"
 ipsec_proto = "{ esp, ah, ipencap }"
 icmp_types = "{ echoreq, unreach }"
 tftp_out = "{ 10000:60000 }"
-
-client_out = "{ \
-  ssh, 23 \
-  smtp, smtps, submission, imap, imaps, pop3, pop3s, \
-  http, https, 3127, 3128, 3129, 5280, 6969, 7878, 8080, \
-  mysql, postgresql, \
-  domain, ntp, \
-  bootps, bootpc, \
-  647, 7911, \
-  tftp, \
-  ftp, ftp-data, ftps, ftps-data, \
-  afpovertcp, rsync, 5900, 5901, \
-  loc-srv, netbios-ns, netbios-dgm, netbios-ssn, microsoft-ds, ldap, ldaps, 3389, \
-  isakmp, l2tp, sae-urn, \
-  64738, 5222, 5269 }"
-
 
 
 ########## OPTIONS ##########
@@ -255,8 +241,20 @@ pass out on $i proto udp from (self) to any port 33433 >< 33626 keep state
 
 #          6f allow outgoing packets that have our address as source,
 #          others are either spoofed or something is misconfigured (NAT disabled,
-#          for instance), we want to be nice and do not send out garbage
-pass out on $i proto { tcp, udp } from (self) to any port \$client_out modulate state
+#          for instance), we want to be nice and do not send out garbage, was client_out
+pass out on $i proto { tcp, udp } from (self) to any port \$ssh_ports modulate state
+pass out on $i proto { tcp, udp } from (self) to any port \$mail_ports modulate state
+pass out on $i proto { tcp, udp } from (self) to any port \$web_ports modulate state
+pass out on $i proto { tcp, udp } from (self) to any port \$db_ports modulate state
+pass out on $i proto { tcp, udp } from (self) to any port \$udp_ports modulate state
+pass out on $i proto { tcp, udp } from (self) to any port \$dhcp_ports modulate state
+pass out on $i proto { tcp, udp } from (self) to any port \$dhcpfailover modulate state
+pass out on $i proto { tcp, udp } from (self) to any port \$tftp_ports modulate state
+pass out on $i proto { tcp, udp } from (self) to any port \$ftp_ports modulate state
+pass out on $i proto { tcp, udp } from (self) to any port \$apple_ports modulate state
+pass out on $i proto { tcp, udp } from (self) to any port \$ms_ports modulate state
+pass out on $i proto { tcp, udp } from (self) to any port \$ipsec_ports modulate state
+pass out on $i proto { tcp, udp } from (self) to any port \$rtc_ports modulate state
 
 #          7f allow tftp out on 10000:60000
 pass out on $i proto udp from (self) port \$tftp_out to any modulate state
@@ -382,8 +380,21 @@ nat on \$tun_if inet from \$localnet to any -> (\$tun_if)
 #          1f VPN
 pass in quick on \$tun_if from any to any
 pass out quick on \$tun_if from any to any
-#          8f allow act as gateway in and out to only some services
-pass log inet proto { tcp, udp } from \$localnet to any port \$client_out keep state
+#          8f allow act as gateway in and out to only some services, was client_out
+pass log inet proto { tcp, udp } from \$localnet to any port \$ssh_ports keep state
+pass log inet proto { tcp, udp } from \$localnet to any port \$mail_ports keep state
+pass log inet proto { tcp, udp } from \$localnet to any port \$web_ports keep state
+pass log inet proto { tcp, udp } from \$localnet to any port \$db_ports keep state
+pass log inet proto { tcp, udp } from \$localnet to any port \$udp_ports keep state
+pass log inet proto { tcp, udp } from \$localnet to any port \$dhcp_ports keep state
+pass log inet proto { tcp, udp } from \$localnet to any port \$dhcpfailover keep state
+pass log inet proto { tcp, udp } from \$localnet to any port \$tftp_ports keep state
+pass log inet proto { tcp, udp } from \$localnet to any port \$ftp_ports keep state
+pass log inet proto { tcp, udp } from \$localnet to any port \$apple_ports keep state
+pass log inet proto { tcp, udp } from \$localnet to any port \$ms_ports keep state
+pass log inet proto { tcp, udp } from \$localnet to any port \$ipsec_ports keep state
+pass log inet proto { tcp, udp } from \$localnet to any port \$rtc_ports keep state
+
 ########## ANTISPOOF ##########
 antispoof for \$int
 EOF
