@@ -236,6 +236,8 @@ pass quick on $i inet proto { tcp, udp } from any port \$dhcp_ports to any port 
 pass quick on $i inet proto { tcp, udp } from any to any port \$dhcpfailover keep state
 pass out quick on $i inet proto { tcp, udp } from any port \$dhcpfailover to any modulate state
 block in on $i from any to 255.255.255.255
+block in quick on $i proto udp from any to any port 137
+block in quick on $i proto udp from any to any port 138
 
 #          3f block sshban
 pass in quick on $i from <white> to (self) keep state
