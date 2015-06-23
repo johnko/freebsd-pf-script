@@ -29,7 +29,7 @@
 ######################################################################
 # Script version is yymmdd-HHMMSS in UTC, date -u +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=150619-072400
+SCRIPTVERSION=150623-092342
 
 ######################################################################
 # Variables you can edit
@@ -70,10 +70,11 @@ martians = "{ \
   10.0.0.0/8, 169.254.0.0/16, 192.0.2.0/24, \
   0.0.0.0/8, 240.0.0.0/4 }"
 
-ssh_ports = "{ ssh }"
+ssh_ports = "{ ssh, 23 }"
+# 23 for gitlab
 mail_ports = "{ smtp, smtps, submission, imap, imaps, pop3, pop3s }"
-web_ports = "{ http, https, 3128, 5280, 6969, 7878, 8080 }"
-# squid is 3128
+web_ports = "{ http, https, 3127, 3128, 3129, 5280, 6969, 7878, 8080 }"
+# squid is 3127, 3128, 3129
 # ejabber web ui is 5280
 db_ports = "{ mysql, postgresql }"
 udp_ports = "{ domain, ntp }"
@@ -93,9 +94,9 @@ icmp_types = "{ echoreq, unreach }"
 tftp_out = "{ 10000:60000 }"
 
 client_out = "{ \
-  ssh, \
+  ssh, 23 \
   smtp, smtps, submission, imap, imaps, pop3, pop3s, \
-  http, https, 3128, 5280, 6969, 7878, 8080, \
+  http, https, 3127, 3128, 3129, 5280, 6969, 7878, 8080, \
   mysql, postgresql, \
   domain, ntp, \
   bootps, bootpc, \
