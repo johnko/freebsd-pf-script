@@ -87,11 +87,13 @@ ftp_ports = "{ ftp, ftp-data, ftps, ftps-data }"
 apple_ports = "{ afpovertcp, rsync, 3689, 1900, 8200, 5900, 5901 }"
 # daap is 3689
 # dlna is 1900, 8200
+# vnc is 5900, 5901
 ms_ports = "{ loc-srv, netbios-ns, netbios-dgm, netbios-ssn, microsoft-ds, ldap, ldaps, 3389 }"
 ipsec_ports = "{ isakmp, l2tp, sae-urn }"
-rtc_ports = "{ 64738, 5222, 5269 }"
+rtc_ports = "{ 64738, 5222, 5269, 10050, 10051 }"
 # murmur/mumble is 64738
 # xmpp/ejabberd is 5222, 5269
+# zabbix is 10050, 10051
 
 ipsec_proto = "{ esp, ah, ipencap }"
 icmp_types = "{ echoreq, unreach }"
