@@ -29,7 +29,7 @@
 ######################################################################
 # Script version is yymmdd-HHMMSS in UTC, date -u +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=150705-181857
+SCRIPTVERSION=150705-183927
 
 ######################################################################
 # Variables you can edit
@@ -321,6 +321,7 @@ pass in on $i proto { tcp, udp } from any to (self) port \$ms_ports keep state (
 pass out on $i proto { tcp, udp } from (self) port \$udp_ports to any modulate state
 pass in on $i proto udp from any to (self) port \$udp_ports keep state ( source-track rule, max-src-states 2 )
 # any for tap/bridge pfsense in bhyve
+pass out on $i proto { tcp, udp } from any to any port \$udp_ports modulate state
 pass in on $i proto udp from any to any port \$udp_ports keep state ( source-track rule, max-src-states 2 )
 
 #          10r rtc ports
