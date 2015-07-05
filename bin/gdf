@@ -29,7 +29,7 @@
 ######################################################################
 # Script version is yymmdd-HHMMSS in UTC, date -u +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=150705-185839
+SCRIPTVERSION=150705-200036
 
 ######################################################################
 # Variables you can edit
@@ -121,16 +121,30 @@ set limit { states 10000, frags 5000, src-nodes 10000, table-entries 100000 }
 #          3o use less memory by dropping IDLE early
 set optimization aggressive
 
-#          4o correctly handle packets
+#          4o bhyve bridge0 and taps
+set skip on bridge0
+EOF
+
+  # tap0 to tap9999
+  if ifconfig -l | grep -o 'tap[0-9][0-9]*' >/dev/null ; then
+    for i in `ifconfig -l | grep -o 'tap[0-9][0-9]*'` ; do
+      cat >>${tmpfile} <<EOF
+set skip on $i
+EOF
+    done
+  fi
+
+  cat >${tmpfile} <<EOF
+#          5o correctly handle packets
 scrub in all fragment reassemble
 
-#          5o Randomize the ID field for all outgoing packets
+#          6o Randomize the ID field for all outgoing packets
 scrub out all random-id
 
-#          6o If you have MTU problem or something like that
+#          7o If you have MTU problem or something like that
 #          scrub out all random-id max-mss 1400
 
-#          7o tables definition
+#          8o tables definition
 table <black> persist file "${prefix}/black.table"
 table <sshban> persist file "${prefix}/sshban.table"
 table <white> persist file "${prefix}/white.table"
@@ -288,9 +302,6 @@ pass in on $i proto { tcp, udp } from any to (self) port \$ssh_ports keep state 
 #          if we don't flush, this should silently slow them down
 pass out on $i proto { tcp, udp } from (self) port \$web_ports to any modulate state
 pass in on $i proto { tcp, udp } from any to (self) port \$web_ports keep state ( max-src-conn 1000, max-src-conn-rate 1000/1, overload <weblimit> )
-# any for tap/bridge pfsense in bhyve
-pass out on $i proto { tcp, udp } from any to any port \$web_ports modulate state
-pass in on $i proto { tcp, udp } from any to any port \$web_ports keep state ( max-src-conn 1000, max-src-conn-rate 1000/1, overload <weblimit> )
 
 #          3r rate limit 1000 connections, at 1000 new per 1 seconds
 #          if we don't flush, this should silently slow them down
@@ -320,9 +331,6 @@ pass in on $i proto { tcp, udp } from any to (self) port \$ms_ports keep state (
 #          9r rate limit udp, can't use overload, only max-src-states
 pass out on $i proto { tcp, udp } from (self) port \$udp_ports to any modulate state
 pass in on $i proto { tcp, udp } from any to (self) port \$udp_ports keep state ( max-src-conn 1000, max-src-conn-rate 1000/1 )
-# any for tap/bridge pfsense in bhyve
-pass out on $i proto { tcp, udp } from any to any port \$udp_ports modulate state
-pass in on $i proto { tcp, udp } from any to any port \$udp_ports keep state ( max-src-conn 1000, max-src-conn-rate 1000/1 )
 
 #          10r rtc ports
 pass out on $i proto { tcp, udp } from (self) port \$rtc_ports to any modulate state
