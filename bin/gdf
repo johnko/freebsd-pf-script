@@ -29,7 +29,7 @@
 ######################################################################
 # Script version is yymmdd-HHMMSS in UTC, date -u +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=150705-200357
+SCRIPTVERSION=150705-201019
 
 ######################################################################
 # Variables you can edit
@@ -79,7 +79,8 @@ web_ports = "{ http, https, 2812, 3127, 3128, 3129, 5280, 6969, 7878, 8080 }"
 # ejabber web ui is 5280
 # tracker is 6969, 7878
 db_ports = "{ mysql, postgresql }"
-udp_ports = "{ domain, ntp }"
+udp_ports = "{ domain, ntp, 1194 }"
+# openvpn is 1194
 dhcp_ports = "{ bootps, bootpc }"
 dhcpfailover = "{ 647, 7911 }"
 tftp_ports = "{ tftp }"
@@ -304,6 +305,9 @@ pass in on $i proto { tcp, udp } from any to (self) port \$ssh_ports keep state 
 #          if we don't flush, this should silently slow them down
 pass out on $i proto { tcp, udp } from (self) port \$web_ports to any modulate state
 pass in on $i proto { tcp, udp } from any to (self) port \$web_ports keep state ( max-src-conn 1000, max-src-conn-rate 1000/1, overload <weblimit> )
+# any for tap/bridge pfsense in bhyve
+pass out on $i proto { tcp, udp } from any to any port \$web_ports modulate state
+pass in on $i proto { tcp, udp } from any to any port \$web_ports keep state ( max-src-conn 1000, max-src-conn-rate 1000/1, overload <weblimit> )
 
 #          3r rate limit 1000 connections, at 1000 new per 1 seconds
 #          if we don't flush, this should silently slow them down
@@ -333,6 +337,9 @@ pass in on $i proto { tcp, udp } from any to (self) port \$ms_ports keep state (
 #          9r rate limit udp, can't use overload, only max-src-states
 pass out on $i proto { tcp, udp } from (self) port \$udp_ports to any modulate state
 pass in on $i proto { tcp, udp } from any to (self) port \$udp_ports keep state ( max-src-conn 1000, max-src-conn-rate 1000/1 )
+# any for tap/bridge pfsense in bhyve
+pass out on $i proto { tcp, udp } from any to any port \$udp_ports modulate state
+pass in on $i proto { tcp, udp } from any to any port \$udp_ports keep state ( max-src-conn 1000, max-src-conn-rate 1000/1 )
 
 #          10r rtc ports
 pass out on $i proto { tcp, udp } from (self) port \$rtc_ports to any modulate state
