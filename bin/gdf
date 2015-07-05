@@ -29,7 +29,7 @@
 ######################################################################
 # Script version is yymmdd-HHMMSS in UTC, date -u +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=150627-100223
+SCRIPTVERSION=150705-181857
 
 ######################################################################
 # Variables you can edit
@@ -288,6 +288,9 @@ pass in on $i proto { tcp, udp } from any to (self) port \$ssh_ports keep state 
 #          if we don't flush, this should silently slow them down
 pass out on $i proto { tcp, udp } from (self) port \$web_ports to any modulate state
 pass in on $i proto { tcp, udp } from any to (self) port \$web_ports keep state ( max-src-conn 1000, max-src-conn-rate 1000/1, overload <weblimit> )
+# any for tap/bridge pfsense in bhyve
+pass out on $i proto { tcp, udp } from any to any port \$web_ports modulate state
+pass in on $i proto { tcp, udp } from any to any port \$web_ports keep state ( max-src-conn 1000, max-src-conn-rate 1000/1, overload <weblimit> )
 
 #          3r rate limit 1000 connections, at 1000 new per 1 seconds
 #          if we don't flush, this should silently slow them down
@@ -317,6 +320,8 @@ pass in on $i proto { tcp, udp } from any to (self) port \$ms_ports keep state (
 #          9r rate limit udp, can't use overload, only max-src-states
 pass out on $i proto { tcp, udp } from (self) port \$udp_ports to any modulate state
 pass in on $i proto udp from any to (self) port \$udp_ports keep state ( source-track rule, max-src-states 2 )
+# any for tap/bridge pfsense in bhyve
+pass in on $i proto udp from any to any port \$udp_ports keep state ( source-track rule, max-src-states 2 )
 
 #          10r rtc ports
 pass out on $i proto { tcp, udp } from (self) port \$rtc_ports to any modulate state
