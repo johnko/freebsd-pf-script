@@ -29,7 +29,7 @@
 ######################################################################
 # Script version is yymmdd-HHMMSS in UTC, date -u +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=150706-025617
+SCRIPTVERSION=150706-025937
 
 ######################################################################
 # Variables you can edit
@@ -89,7 +89,9 @@ apple_ports = "{ afpovertcp, rsync, 3689, 8200, 5900, 5901 }"
 # daap is 3689
 # dlna is 1900, 8200
 # vnc is 5900, 5901
-anycast = "{ 1900 }"
+anycast = "{ 1900, 5353 }"
+# upnp is 1900
+# zeroconf is 5353
 ms_ports = "{ loc-srv, netbios-ns, netbios-dgm, netbios-ssn, microsoft-ds, ldap, ldaps, 3389 }"
 ipsec_ports = "{ isakmp, l2tp, sae-urn }"
 rtc_ports = "{ 64738, 5222, 5269, 10050, 10051 }"
