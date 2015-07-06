@@ -29,7 +29,7 @@
 ######################################################################
 # Script version is yymmdd-HHMMSS in UTC, date -u +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=150706-025937
+SCRIPTVERSION=150706-043651
 
 ######################################################################
 # Variables you can edit
@@ -247,8 +247,8 @@ pass quick on $i inet proto { tcp, udp } from any to any port \$dhcpfailover kee
 pass out quick on $i inet proto { tcp, udp } from any port \$dhcpfailover to any modulate state
 pass quick on $i inet proto { tcp, udp } from any to any port \$anycast keep state
 block in on $i from any to 255.255.255.255
-block in quick on $i proto udp from any to any port 137
-block in quick on $i proto udp from any to any port 138
+pass quick on $i proto udp from any to any port netbios-ns
+pass quick on $i proto udp from any to any port netbios-dgm
 
 #          3f block sshban
 pass in quick on $i from <white> to (self) keep state
