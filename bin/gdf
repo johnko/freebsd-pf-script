@@ -29,7 +29,7 @@
 ######################################################################
 # Script version is yymmdd-HHMMSS in UTC, date -u +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=150705-201019
+SCRIPTVERSION=150706-025617
 
 ######################################################################
 # Variables you can edit
@@ -85,10 +85,11 @@ dhcp_ports = "{ bootps, bootpc }"
 dhcpfailover = "{ 647, 7911 }"
 tftp_ports = "{ tftp }"
 ftp_ports = "{ ftp, ftp-data, ftps, ftps-data }"
-apple_ports = "{ afpovertcp, rsync, 3689, 1900, 8200, 5900, 5901 }"
+apple_ports = "{ afpovertcp, rsync, 3689, 8200, 5900, 5901 }"
 # daap is 3689
 # dlna is 1900, 8200
 # vnc is 5900, 5901
+anycast = "{ 1900 }"
 ms_ports = "{ loc-srv, netbios-ns, netbios-dgm, netbios-ssn, microsoft-ds, ldap, ldaps, 3389 }"
 ipsec_ports = "{ isakmp, l2tp, sae-urn }"
 rtc_ports = "{ 64738, 5222, 5269, 10050, 10051 }"
@@ -242,6 +243,7 @@ pass on $i proto carp keep state
 pass quick on $i inet proto { tcp, udp } from any port \$dhcp_ports to any port \$dhcp_ports keep state
 pass quick on $i inet proto { tcp, udp } from any to any port \$dhcpfailover keep state
 pass out quick on $i inet proto { tcp, udp } from any port \$dhcpfailover to any modulate state
+pass quick on $i inet proto { tcp, udp } from any to any port \$anycast keep state
 block in on $i from any to 255.255.255.255
 block in quick on $i proto udp from any to any port 137
 block in quick on $i proto udp from any to any port 138
