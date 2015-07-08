@@ -29,7 +29,7 @@
 ######################################################################
 # Script version is yymmdd-HHMMSS in UTC, date -u +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=150706-043651
+SCRIPTVERSION=150708-001110
 
 ######################################################################
 # Variables you can edit
@@ -73,7 +73,7 @@ martians = "{ \
 ssh_ports = "{ ssh, 23 }"
 # 23 for gitlab
 mail_ports = "{ smtp, smtps, submission, imap, imaps, pop3, pop3s }"
-web_ports = "{ http, https, 2812, 3127, 3128, 3129, 5280, 6969, 7878, 8080 }"
+web_ports = "{ http, https, 2812, 3127, 3128, 3129, 5280, 6969, 7878, 8080, 8181 }"
 # monit is 2812
 # squid is 3127, 3128, 3129
 # ejabber web ui is 5280
@@ -81,23 +81,29 @@ web_ports = "{ http, https, 2812, 3127, 3128, 3129, 5280, 6969, 7878, 8080 }"
 db_ports = "{ mysql, postgresql }"
 udp_ports = "{ domain, ntp, 1194 }"
 # openvpn is 1194
-dhcp_ports = "{ bootps, bootpc }"
-dhcpfailover = "{ 647, 7911 }"
+dhcp_ports = "{ bootps, bootpc, 546, 547 }"
+dhcpfailover = "{ 647, 847, 7911 }"
 tftp_ports = "{ tftp }"
-ftp_ports = "{ ftp, ftp-data, ftps, ftps-data }"
-apple_ports = "{ afpovertcp, rsync, 3689, 8200, 5900, 5901 }"
+ftp_ports = "{ ftp, ftp-data, ftps, ftps-data, 8021 }"
+apple_ports = "{ afpovertcp, rsync, 3689, 5900, 5901, 8200 }"
 # daap is 3689
 # dlna is 1900, 8200
 # vnc is 5900, 5901
-anycast = "{ 1900, 5353 }"
-# upnp is 1900
+anycast = "{ 427, 1900, 3702, 5353, 5355 }"
+# Service Location Proto is 427
+# Simple Service Discovery Proto is 1900
+# Web Services Dyn Discovery is 3702
 # zeroconf is 5353
-ms_ports = "{ loc-srv, netbios-ns, netbios-dgm, netbios-ssn, microsoft-ds, ldap, ldaps, 3389 }"
+ms_ports = "{ loc-srv, netbios-ns, netbios-dgm, netbios-ssn, microsoft-ds, ldap, ldaps, 689, 3389 }"
 ipsec_ports = "{ isakmp, l2tp, sae-urn }"
-rtc_ports = "{ 64738, 5222, 5269, 10050, 10051 }"
-# murmur/mumble is 64738
+rtc_ports = "{ 994, 4369, 5059:5061, 5222, 5269, 9100, 10050, 10051, 64738 }"
+# irc is 994
+# erlang is 4369
+# SIP/VoIP is 5059:5061
 # xmpp/ejabberd is 5222, 5269
+# printer is 9100
 # zabbix is 10050, 10051
+# murmur/mumble is 64738
 
 ipsec_proto = "{ esp, ah, ipencap }"
 icmp_types = "{ echoreq, unreach }"
@@ -277,6 +283,7 @@ pass out on $i proto { tcp, udp } from (self) to any port \$dhcpfailover modulat
 pass out on $i proto { tcp, udp } from (self) to any port \$tftp_ports modulate state
 pass out on $i proto { tcp, udp } from (self) to any port \$ftp_ports modulate state
 pass out on $i proto { tcp, udp } from (self) to any port \$apple_ports modulate state
+pass out on $i proto { tcp, udp } from (self) to any port \$anycast modulate state
 pass out on $i proto { tcp, udp } from (self) to any port \$ms_ports modulate state
 pass out on $i proto { tcp, udp } from (self) to any port \$ipsec_ports modulate state
 pass out on $i proto { tcp, udp } from (self) to any port \$rtc_ports modulate state
