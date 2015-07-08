@@ -29,7 +29,7 @@
 ######################################################################
 # Script version is yymmdd-HHMMSS in UTC, date -u +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=150708-001110
+SCRIPTVERSION=150708-002906
 
 ######################################################################
 # Variables you can edit
@@ -96,7 +96,8 @@ anycast = "{ 427, 1900, 3702, 5353, 5355 }"
 # zeroconf is 5353
 ms_ports = "{ loc-srv, netbios-ns, netbios-dgm, netbios-ssn, microsoft-ds, ldap, ldaps, 689, 3389 }"
 ipsec_ports = "{ isakmp, l2tp, sae-urn }"
-rtc_ports = "{ 994, 4369, 5059:5061, 5222, 5269, 9100, 10050, 10051, 64738 }"
+rtc_ports = "{ 161, 162, 994, 4369, 5059:5061, 5222, 5269, 9100, 10050, 10051, 64738 }"
+# snmp is 161:162
 # irc is 994
 # erlang is 4369
 # SIP/VoIP is 5059:5061
