@@ -29,7 +29,7 @@
 ######################################################################
 # Script version is yymmdd-HHMMSS in UTC, date +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=150818-053455
+SCRIPTVERSION=150818-104353
 
 BLACKLIST=$( pf-table show black | tr '\n' '|' | tr -d ' ' )
 
@@ -39,5 +39,5 @@ fi
 
 cat /usr/jails/gitlab/var/log/auth.log* \
 | fold -w 150 \
-| grep "Bad protocol version identification" \
+| egrep "(Bad protocol version identification|Did not receive identification string)" \
 | egrep -v "(${BLACKLIST%|})"
