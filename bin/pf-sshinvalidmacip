@@ -29,9 +29,12 @@
 ######################################################################
 # Script version is yymmdd-HHMMSS in UTC, date +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=150818-053455
+SCRIPTVERSION=150818-110027
 
 BLACKLIST=$( pf-table show black | tr '\n' '|' | tr -d ' ' )
+if [ "x${BLACKLIST}" = "x" ]; then
+	BLACKLIST="randomstringofdatahere"
+fi
 
 if ls /var/log/auth.log*bz2 >/dev/null 2>&1 ; then
   bunzip2 /var/log/auth.log*bz2
