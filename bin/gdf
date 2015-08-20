@@ -29,7 +29,7 @@
 ######################################################################
 # Script version is yymmdd-HHMMSS in UTC, date -u +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=150708-002906
+SCRIPTVERSION=150820-031007
 
 ######################################################################
 # Variables you can edit
@@ -200,7 +200,7 @@ load anchor jails from "${prefix}/jails.anchor"
 anchor btfc
 load anchor btfc from "${prefix}/btfc.anchor"
 anchor ftpout
-
+load anchor ftpout from "${prefix}/ftpout.anchor"
 
 
 ########## FILTER ##########
