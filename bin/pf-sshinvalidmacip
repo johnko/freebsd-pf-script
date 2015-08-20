@@ -29,7 +29,7 @@
 ######################################################################
 # Script version is yymmdd-HHMMSS in UTC, date +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=150818-110027
+SCRIPTVERSION=150820-032232
 
 BLACKLIST=$( pf-table show black | tr '\n' '|' | tr -d ' ' )
 if [ "x${BLACKLIST}" = "x" ]; then
@@ -41,6 +41,7 @@ if ls /var/log/auth.log*bz2 >/dev/null 2>&1 ; then
 fi
 
 cat /var/log/auth.log* \
+| sed "s/ `net-ip` / /g" \
 | fold -w 150 \
 | grep -B1 "no matching mac found" \
 | egrep "(Connection from|no matching mac found)" \
