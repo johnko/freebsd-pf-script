@@ -29,7 +29,7 @@
 ######################################################################
 # Script version is yymmdd-HHMMSS in UTC, date +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=150820-032232
+SCRIPTVERSION=150820-032432
 
 BLACKLIST=$( pf-table show black | tr '\n' '|' | tr -d ' ' )
 if [ "x${BLACKLIST}" = "x" ]; then
@@ -42,6 +42,7 @@ fi
 
 cat /usr/jails/gitlab/var/log/auth.log* \
 | sed "s/ `net-ip` / /g" \
+| sed "s/ ${REMOTEHOST} / /g" \
 | fold -w 150 \
 | egrep "(Bad protocol version identification|Did not receive identification string)" \
 | egrep -v "(${BLACKLIST%|})"
