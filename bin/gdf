@@ -29,7 +29,7 @@
 ######################################################################
 # Script version is yymmdd-HHMMSS in UTC, date -u +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=150820-031007
+SCRIPTVERSION=150827-154015
 
 ######################################################################
 # Variables you can edit
@@ -71,13 +71,15 @@ martians = "{ \
   0.0.0.0/8, 240.0.0.0/4 }"
 
 ssh_ports = "{ ssh, 23 }"
-# 23 for gitlab
+# gitlab is 23
 mail_ports = "{ smtp, smtps, submission, imap, imaps, pop3, pop3s }"
-web_ports = "{ http, https, 2812, 3127, 3128, 3129, 5280, 6969, 7878, 8080, 8181 }"
+web_ports = "{ http, https, 2812, 3127, 3128, 3129, 5280, 6969, 7878, 8069, 8080, 8181 }"
 # monit is 2812
 # squid is 3127, 3128, 3129
 # ejabber web ui is 5280
 # tracker is 6969, 7878
+# odoo is 8069
+# webdev is 8080, 8181
 db_ports = "{ mysql, postgresql }"
 udp_ports = "{ domain, ntp, 1194 }"
 # openvpn is 1194
@@ -85,6 +87,7 @@ dhcp_ports = "{ bootps, bootpc, 546, 547 }"
 dhcpfailover = "{ 647, 847, 7911 }"
 tftp_ports = "{ tftp }"
 ftp_ports = "{ ftp, ftp-data, ftps, ftps-data, 8021 }"
+# ftp-proxy is 8021
 apple_ports = "{ afpovertcp, rsync, 3689, 5900, 5901, 8200 }"
 # daap is 3689
 # dlna is 1900, 8200
@@ -94,7 +97,9 @@ anycast = "{ 427, 1900, 3702, 5353, 5355 }"
 # Simple Service Discovery Proto is 1900
 # Web Services Dyn Discovery is 3702
 # zeroconf is 5353
+# Link-Local Multicast Name Resolution is 5355
 ms_ports = "{ loc-srv, netbios-ns, netbios-dgm, netbios-ssn, microsoft-ds, ldap, ldaps, 689, 3389 }"
+# RDP is 3389
 ipsec_ports = "{ isakmp, l2tp, sae-urn }"
 rtc_ports = "{ 161, 162, 994, 4369, 5059:5061, 5222, 5269, 9100, 10050, 10051, 64738 }"
 # snmp is 161:162
