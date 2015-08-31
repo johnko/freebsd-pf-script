@@ -195,7 +195,7 @@ anchor loadbalance
 load anchor loadbalance from "${prefix}/loadbalance.anchor"
 
 #          5t EXAMPLE jail
-#          Port redirection (forwarding) from your IP to your jails’s IPs
+#          Port redirection (forwarding) from your IP to your jails's IPs
 #          rdr on re0 proto tcp to port http -> 10.0.0.1 port http
 #          rdr on re0 proto tcp to port imap -> 10.0.0.2 port imap
 #          If jails need network access (e.g. to download ports) create NAT on your external network interface:
