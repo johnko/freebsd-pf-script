@@ -29,7 +29,7 @@
 ######################################################################
 # Script version is yymmdd-HHMMSS in UTC, date -u +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=150827-154015
+SCRIPTVERSION=150905-222457
 
 ######################################################################
 # Variables you can edit
@@ -369,6 +369,8 @@ pass in proto igmp all allow-opts
 #          12r local peer discovery for bittorrent transmission-cli
 pass out on $i proto udp from (self) to 239.192.152.143 port 6771 modulate state
 pass in on $i proto udp from any to 239.192.152.143 port 6771 keep state ( source-track rule, max-src-states 10 )
+pass out on $i proto udp from (self) to ($i:network) port 6771 modulate state
+pass in on $i proto udp from any to ($i:network) port 6771 keep state ( source-track rule, max-src-states 10 )
 
 
 ########## NO LIMITS ##########
