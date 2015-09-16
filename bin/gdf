@@ -29,7 +29,7 @@
 ######################################################################
 # Script version is yymmdd-HHMMSS in UTC, date -u +%y%m%d-%H%M%S
 ######################################################################
-SCRIPTVERSION=150905-222457
+SCRIPTVERSION=150916-230504
 
 ######################################################################
 # Variables you can edit
@@ -110,6 +110,7 @@ rtc_ports = "{ 161, 162, 994, 4369, 5059:5061, 5222, 5269, 9100, 10050, 10051, 6
 # printer is 9100
 # zabbix is 10050, 10051
 # murmur/mumble is 64738
+torrent_ports = "{ 6881:6891, 60000:61000 }"
 
 ipsec_proto = "{ esp, ah, ipencap }"
 icmp_types = "{ echoreq, unreach }"
@@ -293,6 +294,7 @@ pass out on $i proto { tcp, udp } from (self) to any port \$anycast modulate sta
 pass out on $i proto { tcp, udp } from (self) to any port \$ms_ports modulate state
 pass out on $i proto { tcp, udp } from (self) to any port \$ipsec_ports modulate state
 pass out on $i proto { tcp, udp } from (self) to any port \$rtc_ports modulate state
+pass out on $i proto { tcp, udp } from (self) to any port \$torrent_ports modulate state
 
 #          7f allow tftp out on 10000:60000
 pass out on $i proto udp from (self) port \$tftp_out to any modulate state
@@ -380,6 +382,11 @@ pass in quick on $i proto \$ipsec_proto from any to (self)
 pass in quick on $i proto { tcp, udp } from any port \$ipsec_ports to (self) port \$ipsec_ports
 pass out quick on $i proto \$ipsec_proto from (self) to any
 pass out quick on $i proto { tcp, udp } from (self) port \$ipsec_ports to any port \$ipsec_ports
+
+#          2a delugefs torrents
+pass out on $i proto { tcp, udp } from (self) port \$torrent_ports to any modulate state
+pass in on $i proto { tcp, udp } from any to (self) port \$torrent_ports keep state
+
 EOF
   done
   ########## NOT LOOPED ##########
