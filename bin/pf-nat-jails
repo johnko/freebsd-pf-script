@@ -12,9 +12,10 @@ if [ "x" == "x${HOSTNIC}" ]; then
     HOSTNIC=`netstat -nr | grep default | awk '{print $NF}'`
 fi
 
-if [ -e /etc/pf/jails.anchor ] && \
-    ! cat /etc/pf/jails.anchor | grep "nat pass on ${HOSTNIC} inet from ${IPNET}0/24 to any " >/dev/null 2>/dev/null ; then
+if ! pf-anchor show jails | grep "nat pass on ${HOSTNIC} inet from ${IPNET}0/24 to any " >/dev/null 2>/dev/null ; then
     cat >>/etc/pf/jails.anchor <<EOF
 nat pass on ${HOSTNIC} inet from ${IPNET}0/24 to any -> ${HOSTIP}
 EOF
+    pf-anchor clear jails
+    pf-anchor load jails
 fi
