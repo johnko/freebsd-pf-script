@@ -1,0 +1,20 @@
+#!/bin/sh
+
+if [ "x" == "x${IPNET}" ]; then
+    IPNET="10.7.7."
+fi
+
+if [ "x" == "x${HOSTIP}" ]; then
+    HOSTIP=`ifconfig | grep -v 0xffffffff | grep -v 127.0.0.1 | egrep -o 'inet *([0-9]{1,3}\.){1,3}[0-9]{1,3}' | awk '{print $2}'`
+fi
+
+if [ "x" == "x${HOSTNIC}" ]; then
+    HOSTNIC=`netstat -nr | grep default | awk '{print $NF}'`
+fi
+
+if [ -e /etc/pf/jails.anchor ] && \
+    ! cat /etc/pf/jails.anchor | grep "nat pass on ${HOSTNIC} inet from ${IPNET}0/24 to any " >/dev/null 2>/dev/null ; then
+    cat >>/etc/pf/jails.anchor <<EOF
+nat pass on ${HOSTNIC} inet from ${IPNET}0/24 to any -> ${HOSTIP}
+EOF
+fi
