@@ -1,5 +1,7 @@
 #!/bin/sh
 
+. /usr/local/bin/loadmyvars.sh
+
 if [ "x" == "x${IPNET}" ]; then
     IPNET="10.7.7."
 fi
