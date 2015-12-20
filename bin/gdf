@@ -389,8 +389,8 @@ pass out on $i proto { tcp, udp } from (self) port \$torrent_ports to any modula
 pass in on $i proto { tcp, udp } from any to (self) port \$torrent_ports keep state
 
 #          3a mdns
-pass out on $i proto udp from (self) to 224.0.0.251 modulate state
-pass in on $i proto udp from any to 224.0.0.251 keep state
+pass out on $i proto udp from (self) to 224.0.0.251 port 5353 modulate state
+pass in on $i proto udp from any to 224.0.0.251 port 5353 keep state
 EOF
   done
   ########## NOT LOOPED ##########
