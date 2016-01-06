@@ -1,5 +1,10 @@
 #!/bin/sh
 
+SSHBANLIST=$( pf-table show sshban | tr '\n' '|' | tr -d ' ' )
+if [ "x${SSHBANLIST}" = "x" ]; then
+	SSHBANLIST="randomstringofdatahere"
+fi
+
 BLACKLIST=$( pf-table show black | tr '\n' '|' | tr -d ' ' )
 if [ "x${BLACKLIST}" = "x" ]; then
 	BLACKLIST="randomstringofdatahere"
@@ -17,4 +22,5 @@ cat /var/log/auth.log* \
 | fold -w 150 \
 | grep -B1 "no matching mac found" \
 | egrep "(Connection from|no matching mac found)" \
-| egrep -v "(${BLACKLIST%|})"
+| egrep -v "(${BLACKLIST%|})" \
+| egrep -v "(${SSHBANLIST%|})"
