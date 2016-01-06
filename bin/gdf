@@ -238,7 +238,7 @@ pass quick on $i proto udp from any to any port netbios-dgm
 pass in quick on $i from <white> to (self) keep state
 pass out quick on $i from (self) to <white> modulate state
 block quick on $i from <black>
-block log quick on $i proto { tcp, udp } from <sshban> to (self) port \$ssh_ports
+block quick on $i proto { tcp, udp } from <sshban> to (self) port \$ssh_ports
 
 #          4f allow echo
 pass on $i inet proto icmp all icmp-type \$icmp_types keep state
