@@ -1,35 +1,4 @@
 #!/bin/sh
-######################################################################
-# LICENSE pulled in with, cat LICENSE  | awk '{print "# "$0}'
-######################################################################
-# Copyright (c) 2014-2015, John Ko
-# All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#
-# * Redistributions of source code must retain the above copyright notice, this
-#   list of conditions and the following disclaimer.
-#
-# * Redistributions in binary form must reproduce the above copyright notice,
-#   this list of conditions and the following disclaimer in the documentation
-#   and/or other materials provided with the distribution.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#
-######################################################################
-# Script version is yymmdd-HHMMSS in UTC, date -u +%y%m%d-%H%M%S
-######################################################################
-SCRIPTVERSION=150916-230504
 
 ######################################################################
 # Variables you can edit
@@ -112,6 +81,7 @@ rtc_ports = "{ 161, 162, 994, 4369, 5059:5061, 5222, 5269, 9100, 10050, 10051, 6
 # zabbix is 10050, 10051
 # murmur/mumble is 64738
 torrent_ports = "{ 6881:6891, 60000:61000 }"
+udp_pass_ports = "{ 1200:65535 }"
 
 ipsec_proto = "{ esp, ah, ipencap }"
 icmp_types = "{ echoreq, unreach }"
@@ -391,6 +361,10 @@ pass in on $i proto { tcp, udp } from any to (self) port \$torrent_ports keep st
 #          3a mdns
 pass out on $i proto udp from (self) to 224.0.0.251 port 5353 modulate state
 pass in on $i proto udp from any to 224.0.0.251 port 5353 keep state
+
+#          4a i2p
+pass out on $i proto udp from (self) to any port \$udp_pass_ports modulate state
+pass in on $i proto udp from any to (self) port \$udp_pass_ports keep state
 EOF
   done
   ########## NOT LOOPED ##########
