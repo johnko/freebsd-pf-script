@@ -29,17 +29,9 @@ countblockedhosts(){
 sketchyhosts | while read count ip ; do
     echo $count $ip
     pf-log 2>/dev/null | grep $ip
-    read yesno
-    if [ "xy" = "x$yesno" ]; then
-	pf-table add black $ip
-    fi
 done
 
-counthosts | while read count ip ; do
+countblockedhosts | while read count ip ; do
     echo $count $ip
     pf-log 2>/dev/null | grep $ip
-    read yesno
-    if [ "xy" = "x$yesno" ]; then
-	pf-table add black $ip
-    fi
 done
