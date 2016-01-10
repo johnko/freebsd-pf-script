@@ -51,30 +51,30 @@ echo "================="
 echo sketchyhosts
 
 sketchyhosts | while read count ip ; do
-    echo $count $ip
-    pf-log 2>/dev/null | grep $ip
+    echo "$count $ip"
+    pf-log 2>/dev/null | grep "$ip"
 done
 
 echo "================="
 echo populartheirports
 
 populartheirports | while read count port ; do
-    echo $count $port
-    pf-log 2>/dev/null | grep $port
+    echo "$count $port"
+    pf-log 2>/dev/null | grep "\.$port"
 done
 
 echo "================="
-echo popularmyports | while read count port ; do
-    echo $count $port
-    pf-log 2>/dev/null | grep $port
-done
+echo popularmyports
 
-popularmyports
+popularmyports | while read count port ; do
+    echo "$count $port"
+    pf-log 2>/dev/null | grep "\.$port"
+done
 
 echo "================="
 echo countblockedhosts
 
 countblockedhosts | while read count ip ; do
-    echo $count $ip
-    pf-log 2>/dev/null | grep $ip
+    echo "$count $ip"
+    pf-log 2>/dev/null | grep "$ip"
 done
