@@ -32,19 +32,19 @@ fi
 myip=$( echo $SSH_CONNECTION | awk '{print $1}' )
 
 populartheirports(){
-    pf-log 2>/dev/null | grep -v "$myip" | awk '{print $9}' | awk -F. '{print $5}' | sort | uniq -c | sort | tail
+    pf-log 2>/dev/null | grep -v "$myip" | awk '{print $9}' | awk -F. '{print $5}' | sort | uniq -c | sort
 }
 
 popularmyports(){
-    pf-log 2>/dev/null | grep -v "$myip" | awk '{print $11}' | awk -F. '{print $5}' | sort | uniq -c | sort | tail
+    pf-log 2>/dev/null | grep -v "$myip" | awk '{print $11}' | awk -F. '{print $5}' | sort | uniq -c | sort
 }
 
 sketchyhosts(){
-    pf-log 2>/dev/null | grep -v "$myip" | egrep "($ports)" | egrep -v "($blacklist)" | egrep -v "($sshbanlist)" | awk '{print $9}' | awk -F. '{print $1"."$2"."$3"."$4}' | sort | uniq -c
+    pf-log 2>/dev/null | grep -v "$myip" | egrep "($ports)" | egrep -v "($blacklist)" | egrep -v "($sshbanlist)" | awk '{print $9}' | awk -F. '{print $1"."$2"."$3"."$4}' | sort | uniq -c | sort
 }
 
 countblockedhosts(){
-    pf-log 2>/dev/null | grep -v "$myip" | egrep -v "($blacklist)" | egrep -v "($sshbanlist)" | awk '{print $9}' | awk -F. '{print $1"."$2"."$3"."$4}' | sort | uniq -c | sort | tail
+    pf-log 2>/dev/null | grep -v "$myip" | egrep -v "($blacklist)" | egrep -v "($sshbanlist)" | awk '{print $9}' | awk -F. '{print $1"."$2"."$3"."$4}' | sort | uniq -c | sort
 }
 
 #echo "================="
