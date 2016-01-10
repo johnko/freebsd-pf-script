@@ -68,7 +68,7 @@ echo popularmyports
 
 popularmyports | while read count port ; do
     echo "$count $port"
-    pf-log 2>/dev/null | grep "\.$port:" | egrep -v "($blacklist)" | egrep -v "($sshbanlist)"
+    pf-log 2>/dev/null | grep "\.$port" | egrep -v "($blacklist)" | egrep -v "($sshbanlist)"
 done
 
 echo "================="
