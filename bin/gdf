@@ -81,7 +81,7 @@ rtc_ports = "{ 161, 162, 994, 4369, 5059:5061, 5222, 5269, 9100, 10050, 10051, 6
 # zabbix is 10050, 10051
 # murmur/mumble is 64738
 torrent_ports = "{ 6881:6891, 60000:61000 }"
-udp_pass_ports = "{ 1200:65535 }"
+i2p_ports = "{ 1900:65535 }"
 
 ipsec_proto = "{ esp, ah, ipencap }"
 icmp_types = "{ echoreq, unreach }"
@@ -363,8 +363,8 @@ pass out on $i proto udp from (self) to 224.0.0.251 port 5353 modulate state
 pass in on $i proto udp from any to 224.0.0.251 port 5353 keep state
 
 #          4a i2p
-pass out on $i proto udp from (self) to any port \$udp_pass_ports modulate state
-pass in on $i proto udp from any to (self) port \$udp_pass_ports keep state
+pass out on $i proto udp from (self) to any port \$i2p_ports modulate state
+pass in on $i proto udp from any to (self) port \$i2p_ports keep state
 EOF
   done
   ########## NOT LOOPED ##########
