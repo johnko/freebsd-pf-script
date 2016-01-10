@@ -1,14 +1,17 @@
 #!/bin/sh
 
 blockedports(){
-    echo "8888|\
+    echo "6000|\
+7000|\
+5000|\
+8000|\
+9000|\
 10200|\
 51127|\
 8090|\
 8083|\
 6004|\
 6003|\
-5000|\
 1080|\
 80|\
 9200|\
@@ -28,6 +31,14 @@ fi
 
 myip=$( echo $SSH_CONNECTION | awk '{print $1}' )
 
+populartheirports(){
+    pf-log 2>/dev/null | grep -v "$myip" | awk '{print $9}' | awk -F. '{print $5}' | sort | uniq -c
+}
+
+popularmyports(){
+    pf-log 2>/dev/null | grep -v "$myip" | awk '{print $11}' | awk -F. '{print $5}' | sort | uniq -c
+}
+
 sketchyhosts(){
     pf-log 2>/dev/null | grep -v "$myip" | egrep "($ports)" | egrep -v "($blacklist)" | egrep -v "($sshbanlist)" | awk '{print $9}' | awk -F. '{print $1"."$2"."$3"."$4}' | sort | uniq -c
 }
@@ -36,12 +47,32 @@ countblockedhosts(){
     pf-log 2>/dev/null | grep -v "$myip" | egrep -v "($blacklist)" | egrep -v "($sshbanlist)" | awk '{print $9}' | awk -F. '{print $1"."$2"."$3"."$4}' | sort | uniq -c | sort | tail
 }
 
+echo "================="
+echo sketchyhosts
+
 sketchyhosts | while read count ip ; do
     echo $count $ip
     pf-log 2>/dev/null | grep $ip
 done
 
 echo "================="
+echo populartheirports
+
+populartheirports | while read count port ; do
+    echo $count $port
+    pf-log 2>/dev/null | grep $port
+done
+
+echo "================="
+echo popularmyports | while read count port ; do
+    echo $count $port
+    pf-log 2>/dev/null | grep $port
+done
+
+popularmyports
+
+echo "================="
+echo countblockedhosts
 
 countblockedhosts | while read count ip ; do
     echo $count $ip
