@@ -71,7 +71,7 @@ EOF
     ms_ports = "{ loc-srv, netbios-ns, netbios-dgm, netbios-ssn, microsoft-ds, ldap, ldaps, 689, 3389 }"
         # RDP is 3389
     ipsec_ports = "{ isakmp, l2tp, sae-urn }"
-    rtc_ports = "{ 161, 162, 994, 4369, 5059:5061, 5222, 5269, 9100, 10050, 10051, 17500, 64738 }"
+    rtc_ports = "{ 161, 162, 994, 4369, 5059:5061, 5222, 5269, 9100, 10050, 10051, 64738 }"
         # snmp is 161:162
         # irc is 994
         # erlang is 4369
@@ -79,15 +79,15 @@ EOF
         # xmpp/ejabberd is 5222, 5269
         # printer is 9100
         # zabbix is 10050, 10051
-        # dropbox is 17500
         # murmur/mumble is 64738
     torrent_ports = "{ 6881:6891, 60000:61000 }"
-    anycast = "{ 427, 1900, 3702, 5353, 5355 }"
+    anycast = "{ 427, 1900, 3702, 5353, 5355, 17500 }"
         # Service Location Proto is 427
         # Simple Service Discovery Proto is 1900
         # Web Services Dyn Discovery is 3702
         # zeroconf is 5353
         # Link-Local Multicast Name Resolution is 5355
+        # dropbox is 17500
 
     i2p_ports = "{ 1900:65535 }"
     tftp_ports = "{ tftp }"
@@ -219,15 +219,15 @@ EOF
     pass quick on \$egress proto pfsync modulate state (no-sync)
     pass on \$egress proto carp modulate state
 
-    #          2f silently drop broadcasts (cable modem noise) except allow DHCP
+    #          2f allow DHCP and some broadcasts
     pass quick on \$egress inet proto { tcp, udp } from any port \$dhcp_ports to any port \$dhcp_ports modulate state
     pass quick on \$egress inet proto { tcp, udp } from any to any port \$dhcpfailover modulate state
     pass quick on \$egress inet proto { tcp, udp } from any port \$dhcpfailover to any modulate state
     pass quick on \$egress inet proto { tcp, udp } from any to any port \$anycast modulate state
+    pass quick on \$egress inet proto udp from any to any port netbios-ns keep state
+    pass quick on \$egress inet proto udp from any to any port netbios-dgm keep state
+    #          3f block other broadcasts
     block in on \$egress from any to 255.255.255.255
-    #          pass ms broadcasts
-    pass on \$egress proto udp from any to any port netbios-ns keep state
-    pass on \$egress proto udp from any to any port netbios-dgm keep state
 
     #          3f block sshban
     pass in quick on \$egress from <white> to (self) modulate state
