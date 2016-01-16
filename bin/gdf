@@ -71,7 +71,7 @@ EOF
     ms_ports = "{ loc-srv, netbios-ns, netbios-dgm, netbios-ssn, microsoft-ds, ldap, ldaps, 689, 3389 }"
         # RDP is 3389
     ipsec_ports = "{ isakmp, l2tp, sae-urn }"
-    rtc_ports = "{ 161, 162, 994, 4369, 5059:5061, 5222, 5269, 9100, 10050, 10051, 64738 }"
+    rtc_ports = "{ 161, 162, 994, 4369, 5059:5061, 5222, 5269, 9100, 10050, 10051, 17500, 64738 }"
         # snmp is 161:162
         # irc is 994
         # erlang is 4369
@@ -79,6 +79,7 @@ EOF
         # xmpp/ejabberd is 5222, 5269
         # printer is 9100
         # zabbix is 10050, 10051
+        # dropbox is 17500
         # murmur/mumble is 64738
     torrent_ports = "{ 6881:6891, 60000:61000 }"
     anycast = "{ 427, 1900, 3702, 5353, 5355 }"
