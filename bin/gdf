@@ -13,423 +13,393 @@ backup=/etc/pf/bkp
 
 setuppf()
 {
-  umask 077
-  install -d -m 700 ${prefix} >/dev/null 2>&1
-  chmod -R go-rwx ${prefix}
-  install -d -m 700 ${backup} >/dev/null 2>&1
-  chmod -R go-rwx ${backup}
-  touch ${prefix}/black.table
-  touch ${prefix}/sshban.table
-  touch ${prefix}/white.table
-  touch ${prefix}/weblimit.table
-  touch ${prefix}/maillimit.table
-  touch ${prefix}/outlimit.table
-  touch ${prefix}/btfc.anchor
-  touch ${prefix}/loadbalance.anchor
-  touch ${prefix}/jails.anchor
-  touch ${prefix}/ftpout.anchor
-  cat >${prefix}/ftpout.anchor <<EOF
-pass out quick proto tcp from (self) port >10000 to any modulate state
-pass in quick proto tcp from any port 20 to (self) keep state
+    umask 077
+    install -d -m 700 ${prefix} >/dev/null 2>&1
+    chmod -R go-rwx ${prefix}
+    install -d -m 700 ${backup} >/dev/null 2>&1
+    chmod -R go-rwx ${backup}
+    touch ${prefix}/black.table
+    touch ${prefix}/sshban.table
+    touch ${prefix}/white.table
+    touch ${prefix}/weblimit.table
+    touch ${prefix}/maillimit.table
+    touch ${prefix}/outlimit.table
+    touch ${prefix}/btfc.anchor
+    touch ${prefix}/loadbalance.anchor
+    touch ${prefix}/jails.anchor
+    touch ${prefix}/ftpout.anchor
+    cat >${prefix}/ftpout.anchor <<EOF
+    pass out quick proto tcp from (self) port >10000 to any modulate state
+    pass in quick proto tcp from any port 20 to (self) modulate state
 EOF
-  tmpfile=${prefix}/.pf.tmp
-  cat >${tmpfile} <<EOF
-martians = "{ \
-  127.0.0.0/8, 192.168.0.0/16, 172.16.0.0/12, \
-  10.0.0.0/8, 169.254.0.0/16, 192.0.2.0/24, \
-  0.0.0.0/8, 240.0.0.0/4 }"
+    tmpfile=${prefix}/.pf.tmp
+    HOSTNIC=$(/usr/local/bin/net-nic)
+    ratelimittcp1000="max-src-conn 1000, max-src-conn-rate 1000/1"
+    ratelimitudp1000="source-track rule, max-src-states 1000"
+    cat >${tmpfile} <<EOF
+    egress = "$HOSTNIC"
+    martians = "{ \
+        127.0.0.0/8, 192.168.0.0/16, 172.16.0.0/12, \
+        10.0.0.0/8, 169.254.0.0/16, 192.0.2.0/24, \
+        0.0.0.0/8, 240.0.0.0/4 }"
 
-ssh_ports = "{ ssh, 23, 6371, 6372 }"
-# gitlab is 23
-# keypkg is 6371, 6372
-mail_ports = "{ smtp, smtps, submission, imap, imaps, pop3, pop3s }"
-web_ports = "{ http, https, 2812, 3127, 3128, 3129, 5280, 6969, 7878, 8069, 8080, 8181 }"
-# monit is 2812
-# squid is 3127, 3128, 3129
-# ejabber web ui is 5280
-# tracker is 6969, 7878
-# odoo is 8069
-# webdev is 8080, 8181
-db_ports = "{ mysql, postgresql }"
-udp_ports = "{ domain, ntp, 1194 }"
-# openvpn is 1194
-dhcp_ports = "{ bootps, bootpc, 546, 547 }"
-dhcpfailover = "{ 647, 847, 7911 }"
-tftp_ports = "{ tftp }"
-ftp_ports = "{ ftp, ftp-data, ftps, ftps-data, 8021 }"
-# ftp-proxy is 8021
-apple_ports = "{ afpovertcp, rsync, 3689, 5900, 5901, 8200 }"
-# daap is 3689
-# dlna is 1900, 8200
-# vnc is 5900, 5901
-anycast = "{ 427, 1900, 3702, 5353, 5355 }"
-# Service Location Proto is 427
-# Simple Service Discovery Proto is 1900
-# Web Services Dyn Discovery is 3702
-# zeroconf is 5353
-# Link-Local Multicast Name Resolution is 5355
-ms_ports = "{ loc-srv, netbios-ns, netbios-dgm, netbios-ssn, microsoft-ds, ldap, ldaps, 689, 3389 }"
-# RDP is 3389
-ipsec_ports = "{ isakmp, l2tp, sae-urn }"
-rtc_ports = "{ 161, 162, 994, 4369, 5059:5061, 5222, 5269, 9100, 10050, 10051, 64738 }"
-# snmp is 161:162
-# irc is 994
-# erlang is 4369
-# SIP/VoIP is 5059:5061
-# xmpp/ejabberd is 5222, 5269
-# printer is 9100
-# zabbix is 10050, 10051
-# murmur/mumble is 64738
-torrent_ports = "{ 6881:6891, 60000:61000 }"
-i2p_ports = "{ 1900:65535 }"
+    icmp_types = "{ echoreq, unreach }"
 
-ipsec_proto = "{ esp, ah, ipencap }"
-icmp_types = "{ echoreq, unreach }"
-tftp_out = "{ 10000:60000 }"
+    dhcp_ports = "{ bootps, bootpc, 546, 547 }"
+    dhcpfailover = "{ 647, 847, 7911 }"
 
+    ssh_ports = "{ ssh, 23, 6371, 6372 }"
+        # gitlab is 23
+        # keypkg is 6371, 6372
+    mail_ports = "{ smtp, smtps, submission, imap, imaps, pop3, pop3s }"
+    web_ports = "{ http, https, 2812, 3127, 3128, 3129, 5280, 6969, 7878, 8069, 8080, 8181 }"
+        # monit is 2812
+        # squid is 3127, 3128, 3129
+        # ejabber web ui is 5280
+        # tracker is 6969, 7878
+        # odoo is 8069
+        # webdev is 8080, 8181
+    db_ports = "{ mysql, postgresql }"
+    udp_ports = "{ domain, ntp, 1194 }"
+        # openvpn is 1194
+    ftp_ports = "{ ftp, ftp-data, ftps, ftps-data, 8021 }"
+        # ftp-proxy is 8021
+    apple_ports = "{ afpovertcp, rsync, 3689, 5900, 5901, 8200 }"
+        # daap is 3689
+        # dlna is 1900, 8200
+        # vnc is 5900, 5901
+    ms_ports = "{ loc-srv, netbios-ns, netbios-dgm, netbios-ssn, microsoft-ds, ldap, ldaps, 689, 3389 }"
+        # RDP is 3389
+    ipsec_ports = "{ isakmp, l2tp, sae-urn }"
+    rtc_ports = "{ 161, 162, 994, 4369, 5059:5061, 5222, 5269, 9100, 10050, 10051, 64738 }"
+        # snmp is 161:162
+        # irc is 994
+        # erlang is 4369
+        # SIP/VoIP is 5059:5061
+        # xmpp/ejabberd is 5222, 5269
+        # printer is 9100
+        # zabbix is 10050, 10051
+        # murmur/mumble is 64738
+    torrent_ports = "{ 6881:6891, 60000:61000 }"
+    anycast = "{ 427, 1900, 3702, 5353, 5355 }"
+        # Service Location Proto is 427
+        # Simple Service Discovery Proto is 1900
+        # Web Services Dyn Discovery is 3702
+        # zeroconf is 5353
+        # Link-Local Multicast Name Resolution is 5355
 
-########## OPTIONS ##########
-#          1o respond with conn refused = return, otherwise drop
-set block-policy drop
+    i2p_ports = "{ 1900:65535 }"
+    tftp_ports = "{ tftp }"
+    tftp_out = "{ 10000:60000 }"
 
-#          2o
-#          states - maximum number of entries in the memory pool used for state table
-#          entries (filter rules that specify keep state). Default is 10000.
-#          frags - maximum number of entries in the memory pool used for packet
-#          reassembly (scrub rules). Default is 5000.
-#          src-nodes - maximum number of entries in the memory pool used for
-#          tracking source IP addresses (generated by the sticky-address
-#          and source-track options). Default is 10000.
-#          tables - maximum number of tables that can be created. The default is 1000.
-#          table-entries - the overall limit on how many addresses can be stored in all
-#          tables. The default is 200000. If the system has less than
-#          100MB of physical memory, the default is set to 100000.
-set limit { states 10000, frags 5000, src-nodes 10000, table-entries 100000 }
-
-#          3o use less memory by dropping IDLE early
-set optimization aggressive
-
-#          4o bhyve bridge0 and taps
-set skip on bridge0
-EOF
-
-  # tap0 to tap9999
-  if ifconfig -l | grep -o 'tap[0-9][0-9]*' >/dev/null ; then
-    for i in `ifconfig -l | grep -o 'tap[0-9][0-9]*'` ; do
-      cat >>${tmpfile} <<EOF
-set skip on $i
-EOF
-    done
-  fi
-
-  cat >>${tmpfile} <<EOF
-#          5o correctly handle packets
-scrub in all fragment reassemble
-
-#          6o Randomize the ID field for all outgoing packets
-scrub out all random-id
-
-#          7o If you have MTU problem or something like that
-#          scrub out all random-id max-mss 1400
-
-#          8o tables definition
-table <black> persist file "${prefix}/black.table"
-table <sshban> persist file "${prefix}/sshban.table"
-table <white> persist file "${prefix}/white.table"
-table <weblimit> persist file "${prefix}/weblimit.table"
-table <maillimit> persist file "${prefix}/maillimit.table"
-table <outlimit> persist file "${prefix}/outlimit.table"
+    ipsec_proto = "{ esp, ah, ipencap }"
 
 
 
-########## TRANSLATION ##########
-#          1t outbound FTP
-nat-anchor "ftp-proxy/*"
-nat-anchor loadbalance
-nat-anchor jails
-nat-anchor btfc
-rdr-anchor "ftp-proxy/*"
-rdr pass proto tcp from !127.0.0.1 to any port 21 -> 127.0.0.1 port 8021
-rdr-anchor loadbalance
-rdr-anchor jails
-rdr-anchor btfc
 
-#          2t EXAMPLE Temporarily ban mass downloaders (assuming 401 is not used)
-#          rdr proto tcp from <weblimit> to any port \$web_ports -> 127.0.0.1 port 401
+    ########## OPTIONS ##########
+    #          1o respond with conn refused = return, otherwise drop
+    set block-policy drop
 
-#          3t EXAMPLE redirect tcp 444 to 443
-#          rdr on lo0 proto tcp from any to any port 444 -> 127.0.0.1 port 443
+    #          2o
+    #          states - maximum number of entries in the memory pool used for state table
+    #          entries (filter rules that specify keep state). Default is 10000.
+    #          frags - maximum number of entries in the memory pool used for packet
+    #          reassembly (scrub rules). Default is 5000.
+    #          src-nodes - maximum number of entries in the memory pool used for
+    #          tracking source IP addresses (generated by the sticky-address
+    #          and source-track options). Default is 10000.
+    #          tables - maximum number of tables that can be created. The default is 1000.
+    #          table-entries - the overall limit on how many addresses can be stored in all
+    #          tables. The default is 200000. If the system has less than
+    #          100MB of physical memory, the default is set to 100000.
+    set limit { states 10000, frags 5000, src-nodes 10000, table-entries 100000 }
 
-#          4t EXAMPLE load balance incoming (inet is for ipv4)
-#          web_servers = "{ 10.0.0.10, 10.0.0.11, 10.0.0.13 }"
-#          rdr proto tcp from any to any port 80 -> \$web_servers round-robin sticky-address
-anchor loadbalance
-load anchor loadbalance from "${prefix}/loadbalance.anchor"
+    #          3o use less memory by dropping IDLE early
+    set optimization aggressive
 
-#          5t EXAMPLE jail
-#          Port redirection (forwarding) from your IP to your jails's IPs
-#          rdr on re0 proto tcp to port http -> 10.0.0.1 port http
-#          rdr on re0 proto tcp to port imap -> 10.0.0.2 port imap
-#          If jails need network access (e.g. to download ports) create NAT on your external network interface:
-#          nat on re0 from lo1:network to any -> (re0)
-anchor jails
-load anchor jails from "${prefix}/jails.anchor"
-anchor btfc
-load anchor btfc from "${prefix}/btfc.anchor"
-anchor ftpout
-load anchor ftpout from "${prefix}/ftpout.anchor"
-
-
-########## FILTER ##########
-#          1f block default
-block log (user) all
-
-#          1f.1 Problematic with multi interface
-#          block in log quick from no-route to any
-#          block in log quick from urpf-failed to any
-
-#          1f.2 allow localhost to localhost
+    #          4o bhyve bridge0 and taps
+    set skip on bridge0
 EOF
 
-  # lo0 to lo999
-  if ifconfig -l | grep -o 'lo[0-9][0-9]*' >/dev/null ; then
-    for i in `ifconfig -l | grep -o 'lo[0-9][0-9]*'` ; do
-      cat >>${tmpfile} <<EOF
-pass on $i from (self) to (self)
+    # tap0 to tap9999
+    if ifconfig -l | grep -o 'tap[0-9][0-9]*' >/dev/null ; then
+        for j in `ifconfig -l | grep -o 'tap[0-9][0-9]*'` ; do
+            cat >>${tmpfile} <<EOF
+    set skip on $j
 EOF
-    done
-  fi
+        done
+    fi
 
-  nics=`ifconfig -l | tr ' ' '\n' | \
-  awk '$1 !~ /lo[0-9]/ && \
-  $1 !~ /enc[0-9]/ && \
-  $1 !~ /fwe[0-9]/ && \
-  $1 !~ /fwip[0-9]/ && \
-  $1 !~ /gif[0-9]/ && \
-  $1 !~ /ipfw[0-9]/ && \
-  $1 !~ /pflog[0-9]/ && \
-  $1 !~ /plip[0-9]/ && \
-  $1 !~ /bridge[0-9]/ && \
-  $1 !~ /tap[0-9]/ && \
-  $1 !~ /stf[0-9]/ {print $1}'`
-
-  for i in $nics; do
-    ########## LOOPED PER INTERFACE except lo0, enc0, ipfw0, pflog0, plip0
     cat >>${tmpfile} <<EOF
 
 
 
-########## LOOP FOR $i ##########
+    #          5o correctly handle packets
+    scrub in all fragment reassemble
 
-#          1f.3 allow pfsync and carp
-pass quick on $i proto pfsync keep state (no-sync)
-pass on $i proto carp keep state
+    #          6o Randomize the ID field for all outgoing packets
+    scrub out all random-id
 
-#          2f silently drop broadcasts (cable modem noise) except allow DHCP
-pass quick on $i inet proto { tcp, udp } from any port \$dhcp_ports to any port \$dhcp_ports keep state
-pass quick on $i inet proto { tcp, udp } from any to any port \$dhcpfailover keep state
-pass out quick on $i inet proto { tcp, udp } from any port \$dhcpfailover to any modulate state
-pass quick on $i inet proto { tcp, udp } from any to any port \$anycast keep state
-block in on $i from any to 255.255.255.255
-pass quick on $i proto udp from any to any port netbios-ns
-pass quick on $i proto udp from any to any port netbios-dgm
+    #          7o If you have MTU problem or something like that
+    #          scrub out all random-id max-mss 1400
 
-#          3f block sshban
-pass in quick on $i from <white> to (self) keep state
-pass out quick on $i from (self) to <white> modulate state
-block quick on $i from <black>
-block quick on $i proto { tcp, udp } from <sshban> to (self) port \$ssh_ports
-
-#          4f allow echo
-pass on $i inet proto icmp all icmp-type \$icmp_types keep state
-
-#          5f allow traceroute
-#          allow out the default range for traceroute(8):
-#          "base+nhops*nqueries-1" (33434+64*3-1)
-pass out on $i proto udp from (self) to any port 33433 >< 33626 keep state
-
-#          6f allow outgoing packets that have our address as source,
-#          others are either spoofed or something is misconfigured (NAT disabled,
-#          for instance), we want to be nice and do not send out garbage, was client_out
-pass out on $i proto { tcp, udp } from (self) to any port \$ssh_ports modulate state
-pass out on $i proto { tcp, udp } from (self) to any port \$mail_ports modulate state
-pass out on $i proto { tcp, udp } from (self) to any port \$web_ports modulate state
-pass out on $i proto { tcp, udp } from (self) to any port \$db_ports modulate state
-pass out on $i proto { tcp, udp } from (self) to any port \$udp_ports modulate state
-pass out on $i proto { tcp, udp } from (self) to any port \$dhcp_ports modulate state
-pass out on $i proto { tcp, udp } from (self) to any port \$dhcpfailover modulate state
-pass out on $i proto { tcp, udp } from (self) to any port \$tftp_ports modulate state
-pass out on $i proto { tcp, udp } from (self) to any port \$ftp_ports modulate state
-pass out on $i proto { tcp, udp } from (self) to any port \$apple_ports modulate state
-pass out on $i proto { tcp, udp } from (self) to any port \$anycast modulate state
-pass out on $i proto { tcp, udp } from (self) to any port \$ms_ports modulate state
-pass out on $i proto { tcp, udp } from (self) to any port \$ipsec_ports modulate state
-pass out on $i proto { tcp, udp } from (self) to any port \$rtc_ports modulate state
-pass out on $i proto { tcp, udp } from (self) to any port \$torrent_ports modulate state
-
-#          7f allow tftp out on 10000:60000
-pass out on $i proto udp from (self) port \$tftp_out to any modulate state
-pass out on $i proto udp from (self) to ($i:network)
+    #          8o tables definition
+    table <black> persist file "${prefix}/black.table"
+    table <sshban> persist file "${prefix}/sshban.table"
+    table <white> persist file "${prefix}/white.table"
+    table <weblimit> persist file "${prefix}/weblimit.table"
+    table <maillimit> persist file "${prefix}/maillimit.table"
+    table <outlimit> persist file "${prefix}/outlimit.table"
 
 
 
-########## PUNISH BAD BOYS ##########
-#          1p punish weblimit
-pass in quick on $i proto { tcp, udp } from <weblimit> to (self) port \$web_ports keep state ( max-src-conn 5, max-src-conn-rate 5/2 )
+    ########## TRANSLATION ##########
+    #          1t outbound FTP
+    nat-anchor "ftp-proxy/*"
+    nat-anchor loadbalance
+    nat-anchor jails
+    nat-anchor btfc
+    rdr-anchor "ftp-proxy/*"
+    rdr pass proto tcp from !127.0.0.1 to any port 21 -> 127.0.0.1 port 8021
+    rdr-anchor loadbalance
+    rdr-anchor jails
+    rdr-anchor btfc
 
-#          2p punish maillimit
-pass in quick on $i proto { tcp, udp } from <maillimit> to (self) port \$mail_ports keep state ( max-src-conn 5, max-src-conn-rate 5/2 )
+    #          2t EXAMPLE Temporarily ban mass downloaders (assuming 401 is not used)
+    #          rdr proto tcp from <weblimit> to any port \$web_ports -> 127.0.0.1 port 401
 
-#          3p punish outlimit
-pass out quick on $i from (self) to <outlimit> modulate state ( max-src-conn 5, max-src-conn-rate 5/2 )
+    #          3t EXAMPLE redirect tcp 444 to 443
+    #          rdr on lo0 proto tcp from any to any port 444 -> 127.0.0.1 port 443
 
+    #          4t EXAMPLE load balance incoming (inet is for ipv4)
+    #          web_servers = "{ 10.0.0.10, 10.0.0.11, 10.0.0.13 }"
+    #          rdr proto tcp from any to any port 80 -> \$web_servers round-robin sticky-address
+    anchor loadbalance
+    load anchor loadbalance from "${prefix}/loadbalance.anchor"
 
-
-########## RATE LIMIT ##########
-#          1r rate limit 15 connections, at 15 new per 2 seconds
-pass out on $i proto { tcp, udp } from (self) port \$ssh_ports to any modulate state
-pass in on $i proto { tcp, udp } from any to (self) port \$ssh_ports keep state ( max-src-conn 15, max-src-conn-rate 15/2, overload <sshban> )
-
-#          2r rate limit 1000 connections, at 1000 new per 1 seconds
-#          some browsers open parallel connections
-#          if we don't flush, this should silently slow them down
-pass out on $i proto { tcp, udp } from (self) port \$web_ports to any modulate state
-pass in on $i proto { tcp, udp } from any to (self) port \$web_ports keep state ( max-src-conn 1000, max-src-conn-rate 1000/1, overload <weblimit> )
-# any for tap/bridge pfsense in bhyve
-pass out on $i proto { tcp, udp } from any to any port \$web_ports modulate state
-pass in on $i proto { tcp, udp } from any to any port \$web_ports keep state ( max-src-conn 1000, max-src-conn-rate 1000/1, overload <weblimit> )
-
-#          3r rate limit 1000 connections, at 1000 new per 1 seconds
-#          if we don't flush, this should silently slow them down
-pass out on $i proto { tcp, udp } from (self) port \$mail_ports to any modulate state
-pass in on $i proto { tcp, udp } from any to (self) port \$mail_ports keep state ( max-src-conn 1000, max-src-conn-rate 1000/1, overload <maillimit> )
-
-#          4r databases
-pass out on $i proto { tcp, udp } from (self) port \$db_ports to any modulate state
-pass in on $i proto { tcp, udp } from any to (self) port \$db_ports keep state ( max-src-conn 1000, max-src-conn-rate 1000/1 )
-
-#          5r tftp
-pass out on $i proto { tcp, udp } from (self) port \$tftp_ports to any modulate state
-pass in on $i proto { tcp, udp } from any to (self) port \$tftp_ports keep state ( max-src-conn 1000, max-src-conn-rate 1000/1 )
-
-#          6r ftp
-pass out on $i proto { tcp, udp } from (self) port \$ftp_ports to any modulate state
-pass in on $i proto { tcp, udp } from any to (self) port \$ftp_ports keep state ( max-src-conn 1000, max-src-conn-rate 1000/1 )
-
-#          7r apple
-pass out on $i proto { tcp, udp } from (self) port \$apple_ports to any modulate state
-pass in on $i proto { tcp, udp } from any to (self) port \$apple_ports keep state ( max-src-conn 1000, max-src-conn-rate 1000/1 )
-
-#          8r microsoft
-pass out on $i proto { tcp, udp } from (self) port \$ms_ports to any modulate state
-pass in on $i proto { tcp, udp } from any to (self) port \$ms_ports keep state ( max-src-conn 1000, max-src-conn-rate 1000/1 )
-
-#          9r rate limit udp, can't use overload, only max-src-states
-pass out on $i proto { tcp, udp } from (self) port \$udp_ports to any modulate state
-pass in on $i proto { tcp, udp } from any to (self) port \$udp_ports keep state ( max-src-conn 1000, max-src-conn-rate 1000/1 )
-# any for tap/bridge pfsense in bhyve
-pass out on $i proto { tcp, udp } from any to any port \$udp_ports modulate state
-pass in on $i proto { tcp, udp } from any to any port \$udp_ports keep state ( max-src-conn 1000, max-src-conn-rate 1000/1 )
-
-#          10r rtc ports
-pass out on $i proto { tcp, udp } from (self) port \$rtc_ports to any modulate state
-pass in on $i proto { tcp, udp } from any to (self) port \$rtc_ports keep state ( max-src-conn 1000, max-src-conn-rate 1000/1 )
-
-#          11r IGMP for bittorrent
-pass out proto igmp all allow-opts
-pass in proto igmp all allow-opts
-
-#          12r local peer discovery for bittorrent transmission-cli
-pass out on $i proto udp from (self) to 239.192.152.143 port 6771 modulate state
-pass in on $i proto udp from any to 239.192.152.143 port 6771 keep state ( source-track rule, max-src-states 10 )
-pass out on $i proto udp from (self) to ($i:network) port 6771 modulate state
-pass in on $i proto udp from any to ($i:network) port 6771 keep state ( source-track rule, max-src-states 10 )
+    #          5t EXAMPLE jail
+    #          Port redirection (forwarding) from your IP to your jails's IPs
+    #          rdr on re0 proto tcp to port http -> 10.0.0.1 port http
+    #          rdr on re0 proto tcp to port imap -> 10.0.0.2 port imap
+    #          If jails need network access (e.g. to download ports) create NAT on your external network interface:
+    #          nat on re0 from lo1:network to any -> (re0)
+    anchor jails
+    load anchor jails from "${prefix}/jails.anchor"
+    anchor btfc
+    load anchor btfc from "${prefix}/btfc.anchor"
+    anchor ftpout
+    load anchor ftpout from "${prefix}/ftpout.anchor"
 
 
-########## NO LIMITS ##########
+    ########## FILTER ##########
+    #          1f block default
+    block log (user) all
 
-#          1a VPN
-pass in quick on $i proto \$ipsec_proto from any to (self)
-pass in quick on $i proto { tcp, udp } from any port \$ipsec_ports to (self) port \$ipsec_ports
-pass out quick on $i proto \$ipsec_proto from (self) to any
-pass out quick on $i proto { tcp, udp } from (self) port \$ipsec_ports to any port \$ipsec_ports
+    #          1f.1 Problematic with multi interface
+    #          block in log quick from no-route to any
+    #          block in log quick from urpf-failed to any
 
-#          2a delugefs torrents
-pass out on $i proto { tcp, udp } from (self) port \$torrent_ports to any modulate state
-pass in on $i proto { tcp, udp } from any to (self) port \$torrent_ports keep state
-
-#          3a mdns
-pass out on $i proto udp from (self) to 224.0.0.251 port 5353 modulate state
-pass in on $i proto udp from any to 224.0.0.251 port 5353 keep state
-
-#          4a i2p
-pass out on $i proto udp from (self) to any port \$i2p_ports modulate state
-pass in on $i proto udp from any to (self) port \$i2p_ports keep state
+    #          1f.2 allow localhost to localhost
 EOF
-  done
-  ########## NOT LOOPED ##########
-  cat >>${tmpfile} <<EOF
+
+    # lo0 to lo999
+    if ifconfig -l | grep -o 'lo[0-9][0-9]*' >/dev/null ; then
+        for k in `ifconfig -l | grep -o 'lo[0-9][0-9]*'` ; do
+            cat >>${tmpfile} <<EOF
+    pass on $k from (self) to (self)
+EOF
+        done
+    fi
+
+    cat >>${tmpfile} <<EOF
+
+    #          1f.3 allow pfsync and carp
+    pass quick on \$egress proto pfsync modulate state (no-sync)
+    pass on \$egress proto carp modulate state
+
+    #          2f silently drop broadcasts (cable modem noise) except allow DHCP
+    pass quick on \$egress inet proto { tcp, udp } from any port \$dhcp_ports to any port \$dhcp_ports modulate state
+    pass quick on \$egress inet proto { tcp, udp } from any to any port \$dhcpfailover modulate state
+    pass quick on \$egress inet proto { tcp, udp } from any port \$dhcpfailover to any modulate state
+    pass quick on \$egress inet proto { tcp, udp } from any to any port \$anycast modulate state
+    block in on \$egress from any to 255.255.255.255
+    #          pass ms broadcasts
+    pass on \$egress proto udp from any to any port netbios-ns keep state
+    pass on \$egress proto udp from any to any port netbios-dgm keep state
+
+    #          3f block sshban
+    pass in quick on \$egress from <white> to (self) modulate state
+    pass out quick on \$egress from (self) to <white> modulate state
+    block quick on \$egress from <black>
+    block quick on \$egress proto { tcp, udp } from <sshban> to (self) port \$ssh_ports
+    #          1p punish weblimit
+    pass in quick on \$egress proto { tcp, udp } from <weblimit> to (self) port \$web_ports modulate state ( max-src-conn 5, max-src-conn-rate 5/2 )
+    pass in quick on \$egress proto { tcp, udp } from <maillimit> to (self) port \$mail_ports modulate state ( max-src-conn 5, max-src-conn-rate 5/2 )
+    pass out quick on \$egress from (self) to <outlimit> modulate state ( max-src-conn 5, max-src-conn-rate 5/2 )
+
+    #          4f allow traceroute
+    #          allow out the default range for traceroute(8):
+    #          "base+nhops*nqueries-1" (33434+64*3-1)
+    pass out on \$egress proto udp from (self) to any port 33433 >< 33626 keep state
+
+    #          5f allow outgoing packets that have our address as source,
+    #          others are either spoofed or something is misconfigured (NAT disabled,
+    #          for instance), we want to be nice and do not send out garbage, was client_out
+
+    pass on \$egress inet proto icmp all icmp-type \$icmp_types modulate state
+
+    pass out on \$egress proto { tcp, udp } from (self) to any port \$dhcp_ports modulate state
+    pass out on \$egress proto { tcp, udp } from (self) to any port \$dhcpfailover modulate state
+
+    pass out on \$egress proto { tcp, udp } from (self) to any port \$ssh_ports modulate state
+    pass out on \$egress proto { tcp, udp } from (self) to any port \$mail_ports modulate state
+    pass out on \$egress proto { tcp, udp } from (self) to any port \$web_ports modulate state
+    pass out on \$egress proto { tcp, udp } from (self) to any port \$db_ports modulate state
+
+    pass out on \$egress proto { tcp, udp } from (self) to any port \$udp_ports modulate state
+    pass out on \$egress proto { tcp, udp } from (self) to any port \$ftp_ports modulate state
+    pass out on \$egress proto { tcp, udp } from (self) to any port \$apple_ports modulate state
+    pass out on \$egress proto { tcp, udp } from (self) to any port \$ms_ports modulate state
+
+    pass out on \$egress proto { tcp, udp } from (self) to any port \$ipsec_ports modulate state
+    pass out on \$egress proto { tcp, udp } from (self) to any port \$rtc_ports modulate state
+    pass out on \$egress proto { tcp, udp } from (self) to any port \$torrent_ports modulate state
+    pass out on \$egress proto { tcp, udp } from (self) to any port \$anycast modulate state
+
+    pass out on \$egress proto udp from (self) to any port \$i2p_ports keep state
+    pass out on \$egress proto udp from (self) to any port \$tftp_ports keep state
+    pass out on \$egress proto udp from (self) to any port \$tftp_out keep state
+
+    pass out on \$egress proto \$ipsec_proto from (self) to any
 
 
+    ########## OUTBOUND SERVICE REPLY PACKETS ##########
+    pass out on \$egress proto { tcp, udp } from (self) port \$dhcp_ports to any modulate state
+    pass out on \$egress proto { tcp, udp } from (self) port \$dhcpfailover to any modulate state
 
-########## ANCHORS ##########
-#          special anchor for inbound ftp-proxy and outbound ftp
-anchor "ftp-proxy/*"
-pass out proto tcp from (self) to any port 21 modulate state
+    pass out on \$egress proto { tcp, udp } from (self) port \$ssh_ports to any modulate state
+    pass out on \$egress proto { tcp, udp } from (self) port \$mail_ports to any modulate state
+    pass out on \$egress proto { tcp, udp } from (self) port \$web_ports to any modulate state
+    pass out on \$egress proto { tcp, udp } from (self) port \$db_ports to any modulate state
+
+    pass out on \$egress proto { tcp, udp } from (self) port \$udp_ports to any modulate state
+    pass out on \$egress proto { tcp, udp } from (self) port \$ftp_ports to any modulate state
+    pass out on \$egress proto { tcp, udp } from (self) port \$apple_ports to any modulate state
+    pass out on \$egress proto { tcp, udp } from (self) port \$ms_ports to any modulate state
+
+    pass out on \$egress proto { tcp, udp } from (self) port \$ipsec_ports to any modulate state
+    pass out on \$egress proto { tcp, udp } from (self) port \$rtc_ports to any modulate state
+    pass out on \$egress proto { tcp, udp } from (self) port \$torrent_ports to any modulate state
+    pass out on \$egress proto { tcp, udp } from (self) port \$anycast to any modulate state
+
+    pass out on \$egress proto udp from (self) port \$i2p_ports to any keep state
+    pass out on \$egress proto udp from (self) port \$tftp_ports to any keep state
+    pass out on \$egress proto udp from (self) port \$tftp_out to any keep state
+
+    pass out on \$egress proto \$ipsec_proto from (self) to any
+
+    ########## INBOUND RATE LIMIT  ##########
+    #          rate limit 15 connections, at 15 new per 2 seconds
+    #          if we don't flush, this should silently slow them down
+
+    pass in on \$egress proto { tcp, udp } from any to (self) port \$ssh_ports modulate state ( max-src-conn 15, max-src-conn-rate 15/2, overload <sshban> )
+    pass in on \$egress proto { tcp, udp } from any to (self) port \$mail_ports modulate state ( $ratelimittcp1000 , overload <maillimit> )
+    pass in on \$egress proto { tcp, udp } from any to (self) port \$web_ports modulate state ( $ratelimittcp1000 , overload <weblimit> )
+    pass in on \$egress proto { tcp, udp } from any to (self) port \$db_ports modulate state ( $ratelimittcp1000 )
+
+    pass in on \$egress proto { tcp, udp } from any to (self) port \$udp_ports modulate state ( $ratelimittcp1000 )
+    pass in on \$egress proto { tcp, udp } from any to (self) port \$ftp_ports modulate state ( $ratelimittcp1000 )
+    pass in on \$egress proto { tcp, udp } from any to (self) port \$apple_ports modulate state ( $ratelimittcp1000 )
+    pass in on \$egress proto { tcp, udp } from any to (self) port \$ms_ports modulate state ( $ratelimittcp1000 )
+
+    pass in on \$egress proto { tcp, udp } from any to (self) port \$ipsec_ports
+    pass in on \$egress proto { tcp, udp } from any to (self) port \$rtc_ports modulate state ( $ratelimittcp1000 )
+    pass in on \$egress proto { tcp, udp } from any to (self) port \$torrent_ports modulate state ( $ratelimittcp1000 )
+    pass in on \$egress proto { tcp, udp } from any to (self) port \$anycast modulate state
+
+    pass in on \$egress proto udp from any to (self) port \$i2p_ports keep state ( $ratelimittcp1000 )
+    pass in on \$egress proto udp from any to (self) port \$tftp_ports keep state ( $ratelimittcp1000 )
+    pass in on \$egress proto udp from any to (self) port \$tftp_out keep state ( $ratelimittcp1000 )
+
+    pass in on \$egress proto \$ipsec_proto from any to (self)
+
+    ########## local peer discovery for bittorrent transmission-cli ##########
+    pass in on \$egress proto udp from any to 239.192.152.143 port 6771 keep state ( $ratelimitudp1000 )
+    pass in on \$egress proto udp from any to (egress:network) port 6771 keep state ( $ratelimitudp1000 )
+    pass out on \$egress proto udp from (self) to any port 6771 keep state
+
+    ########## allow udp out to the local network ##########
+    pass out on \$egress proto udp from (self) to (egress:network) keep state
+
+    ########## IGMP for bittorrent? ##########
+    pass out proto igmp all allow-opts
+    pass in proto igmp all allow-opts
+
+    ########## ANCHORS ##########
+    #          special anchor for inbound ftp-proxy and outbound ftp
+    anchor "ftp-proxy/*"
+    pass out proto tcp from (self) to any port 21 modulate state
 EOF
 
   ########## Create backup if different, then replace /etc/pf/pf.conf
-  if ! /usr/bin/diff ${tmpfile} ${prefix}/pf.conf >/dev/null 2>&1 ; then
-    install -d -m 700 ${backup}
-    if [ -e ${prefix}/pf.conf ]; then
-      cp -a ${prefix}/pf.conf ${backup}/pf.conf.`date +%y%m%d-%H%M%S`
+    if ! /usr/bin/diff ${tmpfile} ${prefix}/pf.conf >/dev/null 2>&1 ; then
+        install -d -m 700 ${backup}
+        if [ -e ${prefix}/pf.conf ]; then
+            cp -a ${prefix}/pf.conf ${backup}/pf.conf.`date +%y%m%d-%H%M%S`
+        else
+            cp -a ${tmpfile} ${backup}/pf.conf.`date +%y%m%d-%H%M%S`
+        fi
+        mv -f ${tmpfile} ${prefix}/pf.conf
     else
-      cp -a ${tmpfile} ${backup}/pf.conf.`date +%y%m%d-%H%M%S`
+        rm ${tmpfile}
     fi
-    mv -f ${tmpfile} ${prefix}/pf.conf
-  else
-    rm ${tmpfile}
-  fi
 
-########## NOT USED ##########
-if [ -n "$MYNIC" ]; then
-cat >/dev/null <<EOF
-#          4f block martians that should not be routed through Internet
-#          ONLY UNCOMMENT IF int != int_if
-#block drop in quick on \$int from \$martians to any
-#block drop out quick on \$int from any to \$martians
-tun_if = "gif0"
-int = "$MYNIC"
-ext_ipaddr = "{ $MYIP4ADDRESS }"
-localnet = \$int:network
-#          1t nat tunnel
-nat on \$tun_if inet from \$localnet to any -> (\$tun_if)
-#          2t nat router
-#nat on \$int inet from ! (\$int) to any -> (\$int)
-#          3t nat load balance
-#nat on \$int inet from any to any -> 192.0.2.16/28 source-hash
-#          1f VPN
-pass in quick on \$tun_if from any to any
-pass out quick on \$tun_if from any to any
-#          8f allow act as gateway in and out to only some services, was client_out
-pass log inet proto { tcp, udp } from \$localnet to any port \$ssh_ports keep state
-pass log inet proto { tcp, udp } from \$localnet to any port \$mail_ports keep state
-pass log inet proto { tcp, udp } from \$localnet to any port \$web_ports keep state
-pass log inet proto { tcp, udp } from \$localnet to any port \$db_ports keep state
-pass log inet proto { tcp, udp } from \$localnet to any port \$udp_ports keep state
-pass log inet proto { tcp, udp } from \$localnet to any port \$dhcp_ports keep state
-pass log inet proto { tcp, udp } from \$localnet to any port \$dhcpfailover keep state
-pass log inet proto { tcp, udp } from \$localnet to any port \$tftp_ports keep state
-pass log inet proto { tcp, udp } from \$localnet to any port \$ftp_ports keep state
-pass log inet proto { tcp, udp } from \$localnet to any port \$apple_ports keep state
-pass log inet proto { tcp, udp } from \$localnet to any port \$ms_ports keep state
-pass log inet proto { tcp, udp } from \$localnet to any port \$ipsec_ports keep state
-pass log inet proto { tcp, udp } from \$localnet to any port \$rtc_ports keep state
+    ########## NOT USED ##########
+    if [ -n "$MYNIC" ]; then
+    cat >/dev/null <<EOF
+        ########## ANY FOR TAP/BRIDGE ##########
+        #pass out on \$egress proto { tcp, udp } from any to any port \$web_ports modulate state
+        #pass out on \$egress proto { tcp, udp } from any to any port \$udp_ports modulate state
+        #pass in on \$egress proto { tcp, udp } from any to any port \$web_ports modulate state ( $ratelimittcp1000 , overload <weblimit> )
+        #pass in on \$egress proto { tcp, udp } from any to any port \$udp_ports modulate state ( $ratelimittcp1000 )
+        #pass in on \$egress proto { tcp, udp } from any to any port \$anycast modulate state
+        #          4f block martians that should not be routed through Internet
+        #          ONLY UNCOMMENT IF int != int_if
+        #block drop in quick on \$int from \$martians to any
+        #block drop out quick on \$int from any to \$martians
+        tun_if = "gif0"
+        int = "$MYNIC"
+        ext_ipaddr = "{ $MYIP4ADDRESS }"
+        localnet = \$int:network
+        #          1t nat tunnel
+        nat on \$tun_if inet from \$localnet to any -> (\$tun_if)
+        #          2t nat router
+        #nat on \$int inet from ! (\$int) to any -> (\$int)
+        #          3t nat load balance
+        #nat on \$int inet from any to any -> 192.0.2.16/28 source-hash
+        #          1f VPN
+        pass in quick on \$tun_if from any to any
+        pass out quick on \$tun_if from any to any
+        #          8f allow act as gateway in and out to only some services, was client_out
+        pass log inet proto { tcp, udp } from \$localnet to any port \$ssh_ports modulate state
+        pass log inet proto { tcp, udp } from \$localnet to any port \$mail_ports modulate state
+        pass log inet proto { tcp, udp } from \$localnet to any port \$web_ports modulate state
+        pass log inet proto { tcp, udp } from \$localnet to any port \$db_ports modulate state
+        pass log inet proto { tcp, udp } from \$localnet to any port \$udp_ports modulate state
+        pass log inet proto { tcp, udp } from \$localnet to any port \$dhcp_ports modulate state
+        pass log inet proto { tcp, udp } from \$localnet to any port \$dhcpfailover modulate state
+        pass log inet proto { tcp, udp } from \$localnet to any port \$tftp_ports modulate state
+        pass log inet proto { tcp, udp } from \$localnet to any port \$ftp_ports modulate state
+        pass log inet proto { tcp, udp } from \$localnet to any port \$apple_ports modulate state
+        pass log inet proto { tcp, udp } from \$localnet to any port \$ms_ports modulate state
+        pass log inet proto { tcp, udp } from \$localnet to any port \$ipsec_ports modulate state
+        pass log inet proto { tcp, udp } from \$localnet to any port \$rtc_ports modulate state
 
-########## ANTISPOOF ##########
-antispoof for \$int
+        ########## ANTISPOOF ##########
+        antispoof for \$int
 EOF
-fi
+    fi
 }
 
 ######################################################################
@@ -439,8 +409,8 @@ fi
 setuppf
 
 if service pf status 2>/dev/null | \
-  grep Status | grep Enabled >/dev/null 2>&1 ; then
-  service pf onereload
+    grep Status | grep Enabled >/dev/null 2>&1 ; then
+    service pf onereload
 else
-  service pf onestart
+    service pf onestart
 fi
