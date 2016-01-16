@@ -266,7 +266,7 @@ EOF
     pass out on \$egress proto { tcp, udp } from (self) to any port \$ipsec_ports modulate state
     pass out on \$egress proto { tcp, udp } from (self) to any port \$rtc_ports modulate state
     pass out on \$egress proto { tcp, udp } from (self) to any port \$torrent_ports modulate state
-    pass out on \$egress proto { tcp, udp } from (self) to any port \$anycast modulate state
+    #pass out on \$egress proto { tcp, udp } from (self) to any port \$anycast modulate state
 
     pass out on \$egress proto udp from (self) to any port \$i2p_ports keep state
     pass out on \$egress proto udp from (self) to any port \$tftp_ports keep state
@@ -292,7 +292,7 @@ EOF
     pass out on \$egress proto { tcp, udp } from (self) port \$ipsec_ports to any modulate state
     pass out on \$egress proto { tcp, udp } from (self) port \$rtc_ports to any modulate state
     pass out on \$egress proto { tcp, udp } from (self) port \$torrent_ports to any modulate state
-    pass out on \$egress proto { tcp, udp } from (self) port \$anycast to any modulate state
+    #pass out on \$egress proto { tcp, udp } from (self) port \$anycast to any modulate state
 
     pass out on \$egress proto udp from (self) port \$i2p_ports to any keep state
     pass out on \$egress proto udp from (self) port \$tftp_ports to any keep state
@@ -317,7 +317,7 @@ EOF
     pass in on \$egress proto { tcp, udp } from any to (self) port \$ipsec_ports
     pass in on \$egress proto { tcp, udp } from any to (self) port \$rtc_ports modulate state ( $ratelimittcp1000 )
     pass in on \$egress proto { tcp, udp } from any to (self) port \$torrent_ports modulate state ( $ratelimittcp1000 )
-    pass in on \$egress proto { tcp, udp } from any to (self) port \$anycast modulate state
+    #pass in on \$egress proto { tcp, udp } from any to (self) port \$anycast modulate state
 
     pass in on \$egress proto udp from any to (self) port \$i2p_ports keep state ( $ratelimittcp1000 )
     pass in on \$egress proto udp from any to (self) port \$tftp_ports keep state ( $ratelimittcp1000 )
