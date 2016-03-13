@@ -33,7 +33,7 @@ setuppf()
     pass in quick proto tcp from any port 20 to (self) modulate state
 EOF
     tmpfile=${prefix}/.pf.tmp
-    HOSTNIC=$(/usr/local/bin/net-nic)
+    HOSTNIC=$( netstat -nr | grep default | awk '{print $NF}' )
     ratelimittcp1000="max-src-conn 1000, max-src-conn-rate 1000/1"
     ratelimitudp1000="source-track rule, max-src-states 1000"
     cat >${tmpfile} <<EOF
