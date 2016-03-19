@@ -64,8 +64,8 @@ EOF
         # openvpn is 1194
     ftp_ports = "{ ftp, ftp-data, ftps, ftps-data, 8021 }"
         # ftp-proxy is 8021
-    apple_ports = "{ afpovertcp, rsync, sunrpc, 856, 2049, 3689, 5900, 5901, 8200 }"
-        # nfs is sunrpc, 856, 2049
+    apple_ports = "{ afpovertcp, rsync, sunrpc, 856, 977, 2049, 3689, 5900, 5901, 8200 }"
+        # nfs is sunrpc, 856, 977, 2049
         # daap is 3689
         # dlna is 1900, 8200
         # vnc is 5900, 5901
