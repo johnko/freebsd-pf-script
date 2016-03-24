@@ -84,14 +84,13 @@ EOF
         # zabbix is 10050, 10051
         # murmur/mumble is 64738
     torrent_ports = "{ 6881:6891, 60000:61000 }"
-    anycast = "{ 427, 1900, 3702, 5355, 17500 }"
+    anycast = "{ 427, 1900, 3702, 5353, 5355, 17500 }"
         # Service Location Proto is 427
         # Simple Service Discovery Proto is 1900
         # Web Services Dyn Discovery is 3702
+        # zeroconf is 5353
         # Link-Local Multicast Name Resolution is 5355
         # dropbox is 17500
-    mdns = "{ 5353 }"
-        # zeroconf is 5353
 
     i2p_ports = "{ 1900:65535 }"
     tftp_ports = "{ tftp }"
@@ -270,8 +269,6 @@ EOF
     pass out on \$egress proto { tcp, udp } from (self) to any port \$ipsec_ports modulate state
     pass out on \$egress proto { tcp, udp } from (self) to any port \$rtc_ports modulate state
     pass out on \$egress proto { tcp, udp } from (self) to any port \$torrent_ports modulate state
-    #pass out on \$egress proto { tcp, udp } from (self) to any port \$anycast modulate state
-    pass out on \$egress proto { tcp, udp } from (self) to any port \$mdns modulate state
 
     pass out on \$egress proto udp from (self) to any port \$i2p_ports keep state
     pass out on \$egress proto udp from (self) to any port \$tftp_ports keep state
@@ -297,8 +294,6 @@ EOF
     pass out on \$egress proto { tcp, udp } from (self) port \$ipsec_ports to any modulate state
     pass out on \$egress proto { tcp, udp } from (self) port \$rtc_ports to any modulate state
     pass out on \$egress proto { tcp, udp } from (self) port \$torrent_ports to any modulate state
-    #pass out on \$egress proto { tcp, udp } from (self) port \$anycast to any modulate state
-    pass out on \$egress proto { tcp, udp } from $HOSTIP port \$mdns to any modulate state
 
     pass out on \$egress proto udp from (self) port \$i2p_ports to any keep state
     pass out on \$egress proto udp from (self) port \$tftp_ports to any keep state
@@ -323,9 +318,6 @@ EOF
     pass in on \$egress proto { tcp, udp } from any to (self) port \$ipsec_ports
     pass in on \$egress proto { tcp, udp } from any to (self) port \$rtc_ports modulate state ( $ratelimittcp1000 )
     pass in on \$egress proto { tcp, udp } from any to (self) port \$torrent_ports modulate state ( $ratelimittcp1000 )
-    #pass in on \$egress proto { tcp, udp } from any to (self) port \$anycast modulate state
-    pass in on \$egress proto { tcp, udp } from any to $HOSTIP port \$mdns modulate state
-    pass in on \$egress proto { tcp, udp } from any to 224.0.0.251 port \$mdns modulate state
 
     pass in on \$egress proto udp from any to (self) port \$i2p_ports keep state ( $ratelimittcp1000 )
     pass in on \$egress proto udp from any to (self) port \$tftp_ports keep state ( $ratelimittcp1000 )
