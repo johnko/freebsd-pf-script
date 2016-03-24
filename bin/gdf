@@ -325,6 +325,7 @@ EOF
     pass in on \$egress proto { tcp, udp } from any to (self) port \$torrent_ports modulate state ( $ratelimittcp1000 )
     #pass in on \$egress proto { tcp, udp } from any to (self) port \$anycast modulate state
     pass in on \$egress proto { tcp, udp } from any to $HOSTIP port \$mdns modulate state
+    pass in on \$egress proto { tcp, udp } from any to 224.0.0.251 port \$mdns modulate state
 
     pass in on \$egress proto udp from any to (self) port \$i2p_ports keep state ( $ratelimittcp1000 )
     pass in on \$egress proto udp from any to (self) port \$tftp_ports keep state ( $ratelimittcp1000 )
