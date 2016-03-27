@@ -51,7 +51,7 @@ EOF
 
     ssh_ports = "{ ssh, 23, 6371, 6372 }"
         # gitlab is 23
-        # keypkg is 6371, 6372
+        # keygeli is 6371, 6372
     mail_ports = "{ smtp, smtps, submission, imap, imaps, pop3, pop3s }"
     web_ports = "{ http, https, 2812, 3127, 3128, 3129, 5280, 6969, 7878, 8069, 8080, 8181 }"
         # monit is 2812
