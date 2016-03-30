@@ -84,13 +84,14 @@ EOF
         # zabbix is 10050, 10051
         # murmur/mumble is 64738
     torrent_ports = "{ 6881:6891, 60000:61000 }"
-    anycast = "{ 427, 1900, 3702, 5353, 5355, 17500 }"
+    anycast = "{ 427, 1900, 3702, 5353, 5355, 17500, 57621 }"
         # Service Location Proto is 427
         # Simple Service Discovery Proto is 1900
         # Web Services Dyn Discovery is 3702
         # zeroconf is 5353
         # Link-Local Multicast Name Resolution is 5355
         # dropbox is 17500
+        # spotify is 57621
 
     i2p_ports = "{ 1900:65535 }"
     tftp_ports = "{ tftp }"
