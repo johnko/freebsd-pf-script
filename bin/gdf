@@ -65,9 +65,10 @@ EOF
         # openvpn is 1194
     ftp_ports = "{ ftp, ftp-data, ftps, ftps-data, 8021 }"
         # ftp-proxy is 8021
-    apple_ports = "{ afpovertcp, rsync, sunrpc, 2049, 856, 3689, 5900, 5901, 8200 }"
+    apple_ports = "{ afpovertcp, rsync, sunrpc, 2049, 856, 24007:24017, 38465:38475, 3689, 5900, 5901, 8200 }"
         # nfs is sunrpc, 2049
         # mountd is 856
+        # glusterfs for 10 nodes is sunrpc, 24007-24017, 38465-38475
         # daap is 3689
         # dlna is 1900, 8200
         # vnc is 5900, 5901
