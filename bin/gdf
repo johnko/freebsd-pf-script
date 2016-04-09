@@ -189,7 +189,7 @@ EOF
     #          rdr on re0 proto tcp to port http -> 10.0.0.1 port http
     #          rdr on re0 proto tcp to port imap -> 10.0.0.2 port imap
     #          If jails need network access (e.g. to download ports) create NAT on your external network interface:
-    #          nat on re0 from lo1:network to any -> (re0)
+    #          nat on re0 from lo2:network to any -> (re0)
     anchor jails
     load anchor jails from "${prefix}/jails.anchor"
     anchor btfc
