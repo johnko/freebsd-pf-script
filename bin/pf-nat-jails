@@ -2,10 +2,6 @@
 
 . /usr/local/bin/loadmyvars.sh
 
-if [ "x" == "x${IPNET}" ]; then
-    IPNET="10.7.7."
-fi
-
 if [ "x" == "x${HOSTNIC}" ]; then
     HOSTNIC=`netstat -nr | grep default | awk '{print $NF}'`
 fi
@@ -16,7 +12,7 @@ fi
 
 if ! pf-anchor show jails | grep "nat pass on ${HOSTNIC} inet from ${IPNET}0/24 to any " >/dev/null 2>/dev/null ; then
     cat >>/etc/pf/jails.anchor <<EOF
-nat pass on ${HOSTNIC} inet from ${IPNET}0/24 to any -> ${HOSTIP}
+nat pass on ${HOSTNIC} inet from ${IOCNET}0/24 to any -> ${HOSTIP}
 EOF
     pf-anchor clear jails
     pf-anchor load jails
