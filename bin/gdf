@@ -26,6 +26,7 @@ setuppf()
     touch ${prefix}/outlimit.table
     touch ${prefix}/btfc.anchor
     touch ${prefix}/loadbalance.anchor
+    touch ${prefix}/docker.anchor
     touch ${prefix}/jails.anchor
     touch ${prefix}/ftpout.anchor
     cat >${prefix}/ftpout.anchor <<EOF
@@ -164,11 +165,13 @@ EOF
     #          1t outbound FTP
     nat-anchor "ftp-proxy/*"
     nat-anchor loadbalance
+    nat-anchor docker
     nat-anchor jails
     nat-anchor btfc
     rdr-anchor "ftp-proxy/*"
     rdr pass proto tcp from !127.0.0.1 to any port 21 -> 127.0.0.1 port 8021
     rdr-anchor loadbalance
+    rdr-anchor docker
     rdr-anchor jails
     rdr-anchor btfc
 
@@ -190,6 +193,8 @@ EOF
     #          rdr on re0 proto tcp to port imap -> 10.0.0.2 port imap
     #          If jails need network access (e.g. to download ports) create NAT on your external network interface:
     #          nat on re0 from lo2:network to any -> (re0)
+    anchor docker
+    load anchor docker from "${prefix}/docker.anchor"
     anchor jails
     load anchor jails from "${prefix}/jails.anchor"
     anchor btfc
